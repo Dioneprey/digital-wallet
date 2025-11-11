@@ -3,7 +3,6 @@ import {
   Post,
   HttpCode,
   BadRequestException,
-  ForbiddenException,
   Res,
   Req,
   UnauthorizedException,
@@ -14,8 +13,7 @@ import { Public } from 'src/infra/auth/public';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { EnvService } from 'src/infra/env/env.service';
-import { RefreshTokenUseCase } from 'src/domain/wallet/application/use-cases/sessions/refresh-token';
-import { ResourceInvalidError } from 'src/domain/wallet/application/use-cases/@errors/resource-invalid.error';
+import { RefreshTokenUseCase } from 'src/domain/wallet/application/use-cases/auth/refresh-token';
 import { ResourceNotFoundError } from 'src/domain/wallet/application/use-cases/@errors/resource-not-found.error';
 
 @ApiTags('auth')

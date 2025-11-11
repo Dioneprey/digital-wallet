@@ -60,7 +60,7 @@ describe('Me (E2E)', () => {
       .send();
 
     expect(response.statusCode).toBe(200);
-    expect(response.body).toEqual(
+    expect(response.body.user).toEqual(
       expect.objectContaining({
         sub: user.id.toString(),
       }),

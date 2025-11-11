@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Either, left, right } from 'src/core/either';
 import {
   Transaction,
+  TransactionStatus,
   TransactionType,
 } from 'src/domain/wallet/entities/transaction';
 import { TransactionRepository } from '../../repositories/transaction.repository';
@@ -13,6 +14,7 @@ export interface FetchTransactionsUseCaseRequest {
   pageIndex: number;
   pageSize: number;
   type?: TransactionType;
+  status?: TransactionStatus;
 }
 
 type FetchTransactionsUseCaseResponse = Either<
@@ -36,6 +38,7 @@ export class FetchTransactionsUseCase {
     pageIndex,
     pageSize,
     type,
+    status,
   }: FetchTransactionsUseCaseRequest): Promise<FetchTransactionsUseCaseResponse> {
     const userExists = await this.userRepository.findByUniqueField({
       key: 'id',
@@ -61,6 +64,7 @@ export class FetchTransactionsUseCase {
       filters: {
         type,
         walletId: wallet.id.toString(),
+        status,
       },
     });
 

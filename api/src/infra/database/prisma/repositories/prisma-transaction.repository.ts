@@ -9,6 +9,7 @@ import { RedisRepository } from '../../redis/redis.service';
 import {
   Transaction,
   TransactionKey,
+  TransactionStatus,
 } from 'src/domain/wallet/entities/transaction';
 import {
   PrismaTransactionMapper,
@@ -69,7 +70,7 @@ export class PrismaTransactionRepository implements TransactionRepository {
     pageSize,
   }: TransactionRepositoryFindManyProps) {
     const cacheKey = buildCacheKey({
-      baseKey: `transaction:all:${pageIndex}:${pageSize}`,
+      baseKey: `transaction:all:wallet:${filters!.walletId}${pageIndex}:${pageSize}`,
       filters,
     });
     const cached =
@@ -89,6 +90,9 @@ export class PrismaTransactionRepository implements TransactionRepository {
         where: {
           ...(filters?.type && {
             type: filters.type as TransactionType,
+          }),
+          ...(filters?.status && {
+            status: filters.status as TransactionStatus,
           }),
           ...(filters?.walletId && {
             OR: [
@@ -113,6 +117,9 @@ export class PrismaTransactionRepository implements TransactionRepository {
         where: {
           ...(filters?.type && {
             type: filters.type as TransactionType,
+          }),
+          ...(filters?.status && {
+            status: filters.status as TransactionStatus,
           }),
           ...(filters?.walletId && {
             OR: [
@@ -183,6 +190,9 @@ export class PrismaTransactionRepository implements TransactionRepository {
     walletKeys.forEach((key) => {
       promises.push(
         this.redisRepository.purgeByPrefix(`wallet:${key}:${walletData[key]}`),
+        this.redisRepository.purgeByPrefix(
+          `transaction:all:wallet:${wallet.id.toString()}`,
+        ),
       );
     });
     transactionKeys.forEach((key) => {
@@ -254,6 +264,12 @@ export class PrismaTransactionRepository implements TransactionRepository {
         ),
         this.redisRepository.purgeByPrefix(
           `wallet:${key}:${fromWalletData[key]}`,
+        ),
+        this.redisRepository.purgeByPrefix(
+          `transaction:all:wallet:${fromWallet.id.toString()}`,
+        ),
+        this.redisRepository.purgeByPrefix(
+          `transaction:all:wallet:${toWallet.id.toString()}`,
         ),
       );
     });

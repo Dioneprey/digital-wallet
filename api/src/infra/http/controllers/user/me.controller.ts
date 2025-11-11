@@ -1,13 +1,21 @@
-import { Controller, Get } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { CurrentUser } from 'src/infra/auth/decorators/current-user.decorator';
 import { UserPayload } from 'src/core/types/user-payload';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { MeUseCase } from 'src/domain/wallet/application/use-cases/user/me';
+import { ResourceNotFoundError } from 'src/domain/wallet/application/use-cases/@errors/resource-not-found.error';
+import { UserPresenter } from '../../presenters/user-presenter';
 
 @ApiTags('user')
 @Controller('/me')
 export class GetMeController {
-  constructor() {}
+  constructor(private meUseCase: MeUseCase) {}
 
   @Get()
   @ApiOperation({
@@ -33,6 +41,23 @@ export class GetMeController {
     },
   })
   async handle(@CurrentUser() user: UserPayload) {
-    return user;
+    const result = await this.meUseCase.execute({
+      userId: user.sub,
+    });
+    console.log(result.value);
+
+    if (result.isLeft()) {
+      const error = result.value;
+      switch (error.constructor) {
+        case ResourceNotFoundError:
+          return new NotFoundException(error.message);
+        default:
+          return new BadRequestException(error.message);
+      }
+    }
+
+    const { user: userData } = result.value;
+
+    return { user: UserPresenter.toHTTP(userData) };
   }
 }

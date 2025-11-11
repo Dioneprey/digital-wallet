@@ -3,15 +3,15 @@ import { EnvModule } from '../env/env.module';
 import { DatabaseModule } from '../database/database.module';
 import { HealthController } from './controllers/health.controller';
 import { AuthModule } from '../auth/auth.module';
-import { AuthenticateController } from './controllers/session/authenticate.controller';
-import { RefreshTokenController } from './controllers/session/refresh-token.controller';
+import { AuthenticateController } from './controllers/auth/authenticate.controller';
+import { RefreshTokenController } from './controllers/auth/refresh-token.controller';
 import { RegisterUserController } from './controllers/user/register-user.controller';
 import { CreateDepositTransactionController } from './controllers/transaction/deposit/create-deposit-transaction.controller';
 import { CreateWithdrawTransactionController } from './controllers/transaction/withdraw/withdraw-transaction.controller';
 import { CreateTransferTransactionController } from './controllers/transaction/transfer/create-transfer-transaction.controller';
 import { GetWalletBalanceController } from './controllers/wallet/get-wallet-balance.controller';
-import { AuthenticateUseCase } from 'src/domain/wallet/application/use-cases/sessions/authenticate';
-import { RefreshTokenUseCase } from 'src/domain/wallet/application/use-cases/sessions/refresh-token';
+import { AuthenticateUseCase } from 'src/domain/wallet/application/use-cases/auth/authenticate';
+import { RefreshTokenUseCase } from 'src/domain/wallet/application/use-cases/auth/refresh-token';
 import { CreateDepositTransactionUseCase } from 'src/domain/wallet/application/use-cases/transactions/deposit/create-deposit-transaction';
 import { CreateTransferTransactionUseCase } from 'src/domain/wallet/application/use-cases/transactions/transfer/create-transfer-transaction';
 import { CreateWithdrawTransactionUseCase } from 'src/domain/wallet/application/use-cases/transactions/withdraw/create-withdraw-transaction';
@@ -26,6 +26,7 @@ import { BullMqConfigModule } from '../schedules/bullmq/bullmq.module';
 import { FetchTransactionsUseCase } from 'src/domain/wallet/application/use-cases/transactions/fetch-transactions';
 import { FetchTransactionsController } from './controllers/transaction/fetch-transactions.controller';
 import { GetMeController } from './controllers/user/me.controller';
+import { MeUseCase } from 'src/domain/wallet/application/use-cases/user/me';
 
 @Module({
   imports: [
@@ -37,7 +38,7 @@ import { GetMeController } from './controllers/user/me.controller';
   ],
   controllers: [
     HealthController,
-    // Session
+    // Auth
     AuthenticateController,
     RefreshTokenController,
 
@@ -55,12 +56,13 @@ import { GetMeController } from './controllers/user/me.controller';
     FetchTransactionsController,
   ],
   providers: [
-    // Session
+    // Atuh
     AuthenticateUseCase,
     RefreshTokenUseCase,
 
     // User
     RegisterUserUseCase,
+    MeUseCase,
 
     // Wallet
     GetWalletBalanceUseCase,

@@ -8,7 +8,10 @@ import {
   ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
-import { TransactionType } from 'src/domain/wallet/entities/transaction';
+import {
+  TransactionStatus,
+  TransactionType,
+} from 'src/domain/wallet/entities/transaction';
 import { ZodValidationPipe } from '../../pipes/zod-validation.pipe';
 import { FetchTransactionsUseCase } from 'src/domain/wallet/application/use-cases/transactions/fetch-transactions';
 import { CurrentUser } from 'src/infra/auth/current-user.decorator';
@@ -19,6 +22,7 @@ const fetchTransactionsQuerySchema = z.object({
   pageIndex: z.coerce.number().min(1).default(1),
   pageSize: z.coerce.number().min(1).max(20).default(20),
   type: z.enum(TransactionType).optional(),
+  status: z.enum(TransactionStatus).optional(),
 });
 type FetchTransactionsQuerySchema = z.infer<
   typeof fetchTransactionsQuerySchema
@@ -54,6 +58,12 @@ export class FetchTransactionsController {
     required: false,
     description: 'Filtrar transações por tipo',
     schema: { type: 'string', enum: Object.values(TransactionType) },
+  })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    description: 'Filtrar transações por status',
+    schema: { type: 'string', enum: Object.values(TransactionStatus) },
   })
   @ApiResponse({
     status: 200,
@@ -91,10 +101,11 @@ export class FetchTransactionsController {
     @Query(queryValidationPipe) query: FetchTransactionsQuerySchema,
     @CurrentUser() user: UserPayload,
   ) {
-    const { pageIndex, pageSize, type } = query;
+    const { pageIndex, pageSize, type, status } = query;
 
     const result = await this.fetchTransactions.execute({
       type,
+      status,
       pageIndex,
       pageSize,
       userId: user.sub,

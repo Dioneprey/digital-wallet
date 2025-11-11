@@ -2,6 +2,7 @@ import { PaginationProps, PaginationResponse } from 'src/core/types/pagination';
 import {
   Transaction,
   TransactionKey,
+  TransactionStatus,
   TransactionType,
 } from '../../entities/transaction';
 import { Wallet } from '../../entities/wallet';
@@ -14,6 +15,7 @@ export interface TransactionRepositoryFindByUniqueFieldProps {
 export interface TransactionRepositoryFindManyProps
   extends PaginationProps<{
     type?: TransactionType;
+    status?: TransactionStatus;
     walletId?: string;
   }> {}
 

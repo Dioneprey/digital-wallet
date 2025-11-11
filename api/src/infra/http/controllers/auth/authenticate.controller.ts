@@ -14,7 +14,7 @@ import { Public } from 'src/infra/auth/public';
 import { FastifyReply } from 'fastify';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { EnvService } from 'src/infra/env/env.service';
-import { AuthenticateUseCase } from 'src/domain/wallet/application/use-cases/sessions/authenticate';
+import { AuthenticateUseCase } from 'src/domain/wallet/application/use-cases/auth/authenticate';
 import { WrongCredentialsError } from 'src/domain/wallet/application/use-cases/@errors/wrong-credentials';
 
 const AuthenticateBodySchema = z.object({
@@ -85,7 +85,7 @@ export class AuthenticateController {
       const error = result.value;
       switch (error.constructor) {
         case WrongCredentialsError:
-          return new ForbiddenException(error.message);
+          return new ForbiddenException('Credenciais inválidas');
         default:
           return new BadRequestException(error.message);
       }
