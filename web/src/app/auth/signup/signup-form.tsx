@@ -18,11 +18,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { registerUser } from "../actions/auth";
 import { useRouter } from "next/navigation";
 import { FormErrors } from "@/common/interfaces/form-response.interface";
+import { toast } from "sonner";
 
 export default function SignupForm() {
   const router = useRouter();
 
-  const [state, formAction] = useActionState(registerUser, {
+  const [actionState, formAction] = useActionState(registerUser, {
     errors: null,
     success: false,
   });
@@ -30,12 +31,16 @@ export default function SignupForm() {
   const [errors, setErrors] = useState<FormErrors>({});
 
   useEffect(() => {
-    if (state.success) {
+    if (actionState.success) {
       router.push("/wallet");
-    } else if (state.errors) {
-      setErrors(state.errors);
+    } else if (actionState.errors) {
+      if (actionState.errors?.response) {
+        toast.error("Houve um erro ao realizar cadastro");
+      }
+
+      setErrors(actionState.errors);
     }
-  }, [state]);
+  }, [actionState]);
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     const { name } = e.target;
@@ -62,6 +67,7 @@ export default function SignupForm() {
             name="name"
             label="Nome"
             type="text"
+            defaultValue={actionState.payload?.name as string}
             icon={<Mail size={20} />}
             placeholder="Nome"
             onChange={handleInputChange}
@@ -73,6 +79,7 @@ export default function SignupForm() {
             type="email"
             icon={<Mail size={20} />}
             placeholder="E-mail"
+            defaultValue={actionState.payload?.email as string}
             onChange={handleInputChange}
           />
           <Input
@@ -81,6 +88,7 @@ export default function SignupForm() {
             name="password"
             label="Senha"
             type="password"
+            defaultValue={actionState.payload?.password as string}
             icon={<Lock size={20} />}
             placeholder="Senha"
             onChange={handleInputChange}
@@ -91,6 +99,7 @@ export default function SignupForm() {
             name="password_confirm"
             label="Confirmar senha"
             type="password"
+            defaultValue={actionState.payload?.password_confirm as string}
             icon={<Lock size={20} />}
             placeholder="Confirmar senha"
             onChange={handleInputChange}

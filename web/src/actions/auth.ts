@@ -10,14 +10,14 @@ export async function validateCredentials(
   _prevState: FormResponse,
   formData: FormData
 ): Promise<FormResponse> {
+  const data = Object.fromEntries(formData);
   try {
-    const data = Object.fromEntries(formData);
-
     if (!data.email) {
       return {
         errors: {
           email: "Preencha seu E-mail!",
         },
+        payload: data,
       };
     }
 
@@ -28,29 +28,32 @@ export async function validateCredentials(
     });
 
     if (error) {
-      return { errors: { email: error, password: error } };
+      return { errors: { response: error.message }, payload: data };
     }
 
     await setAuthCookie(res!);
 
-    return { errors: null, success: true };
+    return { errors: null, success: true, payload: data };
   } catch (error) {
-    return { errors: { response: "Ocorreu um erro... Tente novamente!" } };
+    return {
+      errors: { response: "Ocorreu um erro... Tente novamente!" },
+      payload: data,
+    };
   }
 }
 
 export async function registerUser(
   _prevState: FormResponse,
   formData: FormData
-) {
+): Promise<FormResponse> {
+  const data = Object.fromEntries(formData);
   try {
-    const data = Object.fromEntries(formData);
-
     if (!data.name) {
       return {
         errors: {
           name: "Preencha seu nome!",
         },
+        payload: data,
       };
     }
     if (!data.email) {
@@ -58,6 +61,7 @@ export async function registerUser(
         errors: {
           email: "Preencha seu E-mail!",
         },
+        payload: data,
       };
     }
     if (!data.password) {
@@ -65,6 +69,7 @@ export async function registerUser(
         errors: {
           password: "Preencha sua senha!",
         },
+        payload: data,
       };
     }
     if (data.password !== data.password_confirm) {
@@ -72,24 +77,35 @@ export async function registerUser(
         errors: {
           password: "Senhas não batem!",
         },
+        payload: data,
       };
     }
 
     const { error, rawRes: res } = await request({
       method: "POST",
-      path: "user",
+      path: "users",
       data,
     });
 
     if (error) {
-      return { errors: { response: error } };
+      if (error.status === 409) {
+        return {
+          errors: { email: "Usuário com mesmo email já existe" },
+          payload: data,
+        };
+      }
+
+      return { errors: { response: error.message }, payload: data };
     }
 
     await setAuthCookie(res!);
 
-    return { errors: null, success: true };
+    return { errors: null, success: true, payload: data };
   } catch (error) {
-    return { errors: { response: "Ocorreu um erro... Tente novamente!" } };
+    return {
+      errors: { response: "Ocorreu um erro... Tente novamente!" },
+      payload: data,
+    };
   }
 }
 

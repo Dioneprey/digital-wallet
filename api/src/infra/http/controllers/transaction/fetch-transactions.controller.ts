@@ -35,7 +35,6 @@ export class FetchTransactionsController {
   constructor(private fetchTransactions: FetchTransactionsUseCase) {}
 
   @Get()
-  @ApiSecurity('x-api-key')
   @ApiOperation({
     summary: 'Fetch all transactions',
     description:

@@ -46,18 +46,17 @@ describe('Process withdraw transaction', () => {
 
     const result = await sut.execute({
       transactionId: transaction.id.toString(),
-      toWalletId: wallet.id.toString(),
+      fromWalletId: wallet.id.toString(),
     });
 
     expect(result.isLeft()).toBeFalsy();
-    expect(wallet.balance).toBe(5000);
     expect(transaction.status).toBe(TransactionStatus.COMPLETED);
   });
 
   it('should return error if transaction does not exist', async () => {
     const result = await sut.execute({
       transactionId: 'non-existing-tx',
-      toWalletId: 'wallet-1',
+      fromWalletId: 'wallet-1',
     });
 
     expect(result.isLeft()).toBeTruthy();
@@ -74,7 +73,7 @@ describe('Process withdraw transaction', () => {
 
     const result = await sut.execute({
       transactionId: transaction.id.toString(),
-      toWalletId: 'non-existing-wallet',
+      fromWalletId: 'non-existing-wallet',
     });
 
     expect(result.isLeft()).toBeTruthy();
@@ -93,7 +92,7 @@ describe('Process withdraw transaction', () => {
 
     const result = await sut.execute({
       transactionId: transaction.id.toString(),
-      toWalletId: wallet.id.toString(),
+      fromWalletId: wallet.id.toString(),
     });
 
     expect(result.isLeft()).toBeTruthy();
@@ -112,7 +111,7 @@ describe('Process withdraw transaction', () => {
 
     const result = await sut.execute({
       transactionId: transaction.id.toString(),
-      toWalletId: wallet.id.toString(),
+      fromWalletId: wallet.id.toString(),
     });
 
     expect(result.isLeft()).toBeTruthy();

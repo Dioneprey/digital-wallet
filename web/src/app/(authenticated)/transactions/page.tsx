@@ -44,19 +44,11 @@ export default async function Transactions({
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
-            <Suspense
-              fallback={Array.from({ length: 3 }).map((_, index) => (
-                <TransactionItemSkeleton
-                  key={`transcation-item-skeleton-${index}`}
-                />
-              ))}
-            >
-              <TransactionsList
-                status={status}
-                type={type}
-                pageIndex={pageIndex}
-              />
-            </Suspense>
+            <TransactionsList
+              status={status}
+              type={type}
+              pageIndex={pageIndex}
+            />
           </CardContent>
         </Card>
       </main>

@@ -56,6 +56,7 @@ export class BullMQProcessTransferTransactionProcessor extends WorkerHost {
       transactionId: job.data.transactionId,
       fromWalletId: job.data.fromWalletId,
       status: TransactionStatus.FAILED,
+      shouldChangeAmount: true,
     });
   }
 }

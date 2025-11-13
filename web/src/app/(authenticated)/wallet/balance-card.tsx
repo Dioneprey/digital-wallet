@@ -7,7 +7,6 @@ import {
 import { ActionLink } from "./action-link";
 import { Plus, Minus, ArrowLeftRight } from "lucide-react";
 import { ShowBalance } from "./show-balance";
-import { Suspense } from "react";
 
 export async function BalanceCard() {
   return (
@@ -17,13 +16,7 @@ export async function BalanceCard() {
           <CardDescription className="text-primary-foreground/80">
             Saldo disponível
           </CardDescription>
-          <Suspense
-            fallback={
-              <div className="animate-pulse h-10 w-32 bg-primary-foreground/20 rounded-xl" />
-            }
-          >
-            <ShowBalance />
-          </Suspense>
+          <ShowBalance />
         </div>
       </CardHeader>
       <CardContent className="grid grid-cols-3 gap-3 pt-6">

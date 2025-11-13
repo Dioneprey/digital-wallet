@@ -22,7 +22,7 @@ export function ToggleBalance({
           color === "WHITE" ? "text-white" : "text-black"
         }`}
       >
-        {showBalance ? formatCurrency(balance) : "R$ ••••••"}
+        {showBalance ? formatCurrency(balance) : "R$ •••••"}
       </span>
       <Button
         variant="ghost"

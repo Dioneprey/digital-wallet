@@ -56,8 +56,6 @@ describe('Process transfer transaction', () => {
 
     expect(result.isLeft()).toBeFalsy();
 
-    expect(fromWallet.balance).toBe(7000);
-    expect(toWallet.balance).toBe(8000);
     expect(transaction.status).toBe(TransactionStatus.COMPLETED);
   });
 

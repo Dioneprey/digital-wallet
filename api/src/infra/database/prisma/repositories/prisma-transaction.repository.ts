@@ -288,7 +288,7 @@ export class PrismaTransactionRepository implements TransactionRepository {
     userKeys.forEach((key) => {
       promises.push(
         this.redisRepository.purgeByPrefix(
-          `user:${key}:${updatedToWallet.user[key]}`,
+          `user:${key}:${updatedFromWallet.user[key]}`,
         ),
         this.redisRepository.purgeByPrefix(
           `user:${key}:${updatedToWallet.user[key]}`,

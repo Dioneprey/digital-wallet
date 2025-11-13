@@ -1,11 +1,53 @@
+import { PaginationResponse } from 'src/core/types/pagination';
 import {
   TransactionRepository,
   TransactionRepositoryFindByUniqueFieldProps,
+  TransactionRepositoryFindManyProps,
 } from 'src/domain/wallet/application/repositories/transaction.repository';
 import { Transaction } from 'src/domain/wallet/entities/transaction';
+import { TransactionPresenter } from 'src/infra/http/presenters/transaction-presenter';
 
 export class InMemoryTransactionRepository implements TransactionRepository {
   public items: Transaction[] = [];
+
+  async findMany({
+    pageIndex = 1,
+    pageSize = 10,
+    filters,
+  }: TransactionRepositoryFindManyProps): Promise<
+    PaginationResponse<Transaction>
+  > {
+    let transactions = [...this.items];
+
+    if (filters) {
+      if (filters.status) {
+        transactions = transactions.filter((o) => o.status === filters.status);
+      }
+      if (filters.type) {
+        transactions = transactions.filter((o) => o.type === filters.type);
+      }
+      if (filters.walletId) {
+        transactions = transactions.filter(
+          (o) =>
+            o.fromWalletId?.toString() === filters.walletId ||
+            o.toWalletId?.toString() === filters.walletId,
+        );
+      }
+    }
+
+    const start = (pageIndex - 1) * pageSize;
+    const paginated = transactions.slice(start, start + pageSize);
+
+    const totalCount = transactions.length;
+    const totalPages = Math.ceil(totalCount / pageSize);
+
+    return {
+      data: paginated,
+      pageIndex,
+      totalCount,
+      totalPages: totalPages,
+    };
+  }
 
   async findByUniqueField({
     key,

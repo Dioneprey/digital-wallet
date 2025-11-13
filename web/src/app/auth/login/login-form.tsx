@@ -17,6 +17,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormErrors } from "@/common/interfaces/form-response.interface";
+import { toast } from "sonner";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -32,6 +33,10 @@ export default function LoginForm() {
     if (actionState.success) {
       router.push("/wallet");
     } else if (actionState.errors) {
+      if (actionState.errors?.response) {
+        toast.error("Houve um erro ao realizar login");
+      }
+
       setErrors(actionState.errors);
     }
   }, [actionState]);
@@ -51,6 +56,7 @@ export default function LoginForm() {
             icon={<Mail size={20} />}
             placeholder="E-mail"
             error={errors}
+            defaultValue={actionState.payload?.email as string}
             onChange={() => {
               if (errors) {
                 setErrors(null);
@@ -62,6 +68,7 @@ export default function LoginForm() {
             name="password"
             label="Senha"
             type="password"
+            defaultValue={actionState.payload?.password as string}
             icon={<Lock size={20} />}
             placeholder="Senha"
             onChange={() => {

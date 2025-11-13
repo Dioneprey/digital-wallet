@@ -8,8 +8,10 @@ import { makeUser } from 'test/factories/make-user';
 import { FakeProcessWithdrawTransactionSchedule } from 'test/schedules/fake-process-withdraw-transaction.schedule';
 import { TransactionStatus } from 'src/domain/wallet/entities/transaction';
 import { ResourceNotFoundError } from '../../@errors/resource-not-found.error';
+import { InMemoryWalletRepository } from 'test/repositories/in-memory-wallet.repository';
 
 let inMemoryUserRepository: InMemoryUserRepository;
+let inMemoryWalletRepository: InMemoryWalletRepository;
 let inMemoryTransactionRepository: InMemoryTransactionRepository;
 let fakeProcessWithdrawTransactionSchedule: FakeProcessWithdrawTransactionSchedule;
 let sut: CreateWithdrawTransactionUseCase;
@@ -17,12 +19,14 @@ let sut: CreateWithdrawTransactionUseCase;
 describe('Create withdraw transaction', () => {
   beforeEach(() => {
     inMemoryUserRepository = new InMemoryUserRepository();
+    inMemoryWalletRepository = new InMemoryWalletRepository();
     inMemoryTransactionRepository = new InMemoryTransactionRepository();
     fakeProcessWithdrawTransactionSchedule =
       new FakeProcessWithdrawTransactionSchedule();
 
     sut = new CreateWithdrawTransactionUseCase(
       inMemoryUserRepository,
+      inMemoryWalletRepository,
       inMemoryTransactionRepository,
       fakeProcessWithdrawTransactionSchedule,
     );
@@ -58,7 +62,7 @@ describe('Create withdraw transaction', () => {
     expect(fakeProcessWithdrawTransactionSchedule.jobs[0].data).toEqual(
       expect.objectContaining({
         transactionId: transaction.id.toString(),
-        toWalletId: wallet.id.toString(),
+        fromWalletId: wallet.id.toString(),
       }),
     );
   });

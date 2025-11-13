@@ -6,7 +6,7 @@ import { DollarSign, LoaderCircle } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
-import { createWithdraw } from "./actions/withdraw";
+import { createWithdraw } from "../../../actions/withdraw";
 import { useFormStatus } from "react-dom";
 import { FormErrors } from "@/common/interfaces/form-response.interface";
 import { AmountInput } from "@/components/amount-input";
@@ -38,7 +38,9 @@ export function WithdrawForm({ balance }: WithdrawFormProps) {
 
       router.push("/wallet");
     } else if (actionState.errors) {
-      toast.error("Houve um erro ao realizar pedido de saque");
+      if (actionState.errors?.response) {
+        toast.error("Houve um erro ao realizar pedido de saque");
+      }
 
       setErrors(actionState.errors);
     }
@@ -58,7 +60,7 @@ export function WithdrawForm({ balance }: WithdrawFormProps) {
             error={errors}
             min={100}
             max={balance}
-            defaultValue={actionState.payload?.get("amount") as string}
+            defaultValue={actionState.payload?.amount as string}
             onChangeFormatted={(amount) => {
               if (!isNaN(amount)) {
                 setAmount(amount);
@@ -87,7 +89,7 @@ export function WithdrawForm({ balance }: WithdrawFormProps) {
           placeholder="Adicione uma nota sobre este saque"
           label={`Descrição (opcional)`}
           rows={3}
-          defaultValue={actionState.payload?.get("description") as string}
+          defaultValue={actionState.payload?.description as string}
           error={errors}
           onChange={() => {
             if (errors) {

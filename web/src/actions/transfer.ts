@@ -3,12 +3,20 @@
 import { FormResponse } from "@/common/interfaces/form-response.interface";
 import { request } from "@/common/util/fetch";
 
-export async function createWithdraw(
+export async function createTransfer(
   _prevState: FormResponse,
   formData: FormData
 ): Promise<FormResponse> {
+  const data = Object.fromEntries(formData);
   try {
-    const data = Object.fromEntries(formData);
+    if (!data.toUserId) {
+      return {
+        errors: {
+          toUserId: "Preencha o destinatário",
+        },
+        payload: data,
+      };
+    }
 
     if (!data.amount || data.amount === "0") {
       return {
@@ -20,7 +28,7 @@ export async function createWithdraw(
 
     const { error } = await request({
       method: "POST",
-      path: "transactions/withdraw",
+      path: "transactions/transfer",
       data: {
         ...data,
         amount: Number(data.amount),
@@ -28,11 +36,14 @@ export async function createWithdraw(
     });
 
     if (error) {
-      return { errors: { email: error, password: error } };
+      return { errors: { response: error.message }, payload: data };
     }
 
     return { errors: null, success: true };
   } catch (error) {
-    return { errors: { response: "Ocorreu um erro... Tente novamente!" } };
+    return {
+      errors: { response: "Ocorreu um erro... Tente novamente!" },
+      payload: data,
+    };
   }
 }

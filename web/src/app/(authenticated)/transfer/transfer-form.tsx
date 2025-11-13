@@ -5,7 +5,7 @@ import { DollarSign, LoaderCircle } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
-import { createTransfer } from "./actions/transfer";
+import { createTransfer } from "../../../actions/transfer";
 import { useFormStatus } from "react-dom";
 import { FormErrors } from "@/common/interfaces/form-response.interface";
 import { AmountInput } from "@/components/amount-input";
@@ -39,7 +39,9 @@ export function TransferForm({ balance }: TransferFormProps) {
 
       router.push("/wallet");
     } else if (actionState.errors) {
-      toast.error("Houve um erro ao realizar pedido de transferência");
+      if (actionState.errors?.response) {
+        toast.error("Houve um erro ao realizar pedido de transferência");
+      }
 
       setErrors(actionState.errors);
     }
@@ -78,7 +80,7 @@ export function TransferForm({ balance }: TransferFormProps) {
             error={errors}
             min={(balance || 0) > 100 ? 100 : balance}
             max={balance}
-            defaultValue={actionState.payload?.get("amount") as string}
+            defaultValue={actionState.payload?.amount as string}
             onChangeFormatted={(amount) => {
               if (!isNaN(amount)) {
                 setAmount(amount);
@@ -107,7 +109,7 @@ export function TransferForm({ balance }: TransferFormProps) {
           placeholder="Adicione uma nota sobre este transferência"
           label={`Descrição (opcional)`}
           rows={3}
-          defaultValue={actionState.payload?.get("description") as string}
+          defaultValue={actionState.payload?.description as string}
           error={errors}
           onChange={() => {
             if (errors) {

@@ -1,12 +1,11 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/text-area";
 import { DollarSign, LoaderCircle } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
-import { createDeposit } from "./actions/deposit";
+import { createDeposit } from "../../../actions/deposit";
 import { useFormStatus } from "react-dom";
 import { FormErrors } from "@/common/interfaces/form-response.interface";
 import { AmountInput } from "@/components/amount-input";
@@ -35,11 +34,13 @@ export function DepositForm({ balance }: DepositFormProps) {
     if (actionState.success) {
       toast.success("Pedido de depósito realizado com sucesso");
       setAmount(0);
-      queryClient.invalidateQueries({ queryKey: ["balance"] });
 
+      queryClient.invalidateQueries({ queryKey: ["balance"] });
       router.push("/wallet");
     } else if (actionState.errors) {
-      toast.error("Houve um erro ao realizar pedido de depósito");
+      if (actionState.errors?.response) {
+        toast.error("Houve um erro ao realizar pedido de depósito");
+      }
 
       setErrors(actionState.errors);
     }
@@ -58,7 +59,7 @@ export function DepositForm({ balance }: DepositFormProps) {
             step="0.01"
             min={100}
             error={errors}
-            defaultValue={actionState.payload?.get("amount") as string}
+            defaultValue={actionState.payload?.amount as string}
             onChangeFormatted={(amount) => {
               if (!isNaN(amount)) {
                 setAmount(amount);
@@ -87,7 +88,7 @@ export function DepositForm({ balance }: DepositFormProps) {
           placeholder="Adicione uma nota sobre este depósito"
           label={`Descrição (opcional)`}
           rows={3}
-          defaultValue={actionState.payload?.get("description") as string}
+          defaultValue={actionState.payload?.description as string}
           error={errors}
           onChange={() => {
             if (errors) {

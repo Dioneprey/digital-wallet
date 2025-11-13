@@ -54,6 +54,7 @@ export class BullMQProcessDepositTransactionProcessor extends WorkerHost {
     await this.updateTransactionOnErrorUseCase.execute({
       transactionId: job.data.transactionId,
       status: TransactionStatus.FAILED,
+      shouldChangeAmount: false,
     });
   }
 }

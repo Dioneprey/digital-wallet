@@ -55,14 +55,27 @@ export const mockTransactions: Transaction[] = [
 export async function fetchTransactions({
   status,
   type,
-  pageIndex,
-  pageSize,
+  pageIndex = 1,
+  pageSize = 10,
 }: FetchTransactionsProps) {
+  const tags = ["transactions", String(pageIndex), String(pageSize)];
+
+  if (status) {
+    tags.push(status?.toUpperCase());
+  }
+  if (type) {
+    tags.push(type?.toUpperCase());
+  }
+  if (status) {
+    tags.push(status?.toUpperCase());
+  }
+
   const response = await get<{
     transactions: Transaction[];
     meta: PaginationMetaResponse;
   }>({
     path: "transactions",
+    tags: tags,
     params: {
       status: status?.toUpperCase(),
       type: type?.toUpperCase(),

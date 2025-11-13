@@ -9,7 +9,6 @@ import {
 
 import { z } from 'zod';
 import { ZodValidationPipe } from '../../../pipes/zod-validation.pipe';
-import { Public } from 'src/infra/auth/public';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ResourceAlreadyExists } from 'src/domain/wallet/application/use-cases/@errors/resource-already-exists.error';
 import { CreateWithdrawTransactionUseCase } from 'src/domain/wallet/application/use-cases/transactions/withdraw/create-withdraw-transaction';
@@ -37,7 +36,6 @@ export class CreateWithdrawTransactionController {
   ) {}
 
   @Post()
-  @HttpCode(201)
   @HttpCode(201)
   @ApiOperation({
     summary: 'Create withdraw transaction',

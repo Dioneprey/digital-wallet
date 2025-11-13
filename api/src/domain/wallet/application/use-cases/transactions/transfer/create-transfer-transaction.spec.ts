@@ -7,8 +7,10 @@ import { makeWallet } from 'test/factories/make-wallet';
 import { makeUser } from 'test/factories/make-user';
 import { FakeProcessTransferTransactionSchedule } from 'test/schedules/fake-process-transfer-transaction.schedule';
 import { ResourceInvalidError } from '../../@errors/resource-invalid.error';
+import { InMemoryWalletRepository } from 'test/repositories/in-memory-wallet.repository';
 
 let inMemoryUserRepository: InMemoryUserRepository;
+let inMemoryWalletRepository: InMemoryWalletRepository;
 let inMemoryTransactionRepository: InMemoryTransactionRepository;
 let fakeProcessTransferTransactionSchedule: FakeProcessTransferTransactionSchedule;
 let sut: CreateTransferTransactionUseCase;
@@ -16,6 +18,7 @@ let sut: CreateTransferTransactionUseCase;
 describe('Create transfer transaction', () => {
   beforeEach(() => {
     inMemoryUserRepository = new InMemoryUserRepository();
+    inMemoryWalletRepository = new InMemoryWalletRepository();
     inMemoryTransactionRepository = new InMemoryTransactionRepository();
     fakeProcessTransferTransactionSchedule =
       new FakeProcessTransferTransactionSchedule();
@@ -23,6 +26,7 @@ describe('Create transfer transaction', () => {
     sut = new CreateTransferTransactionUseCase(
       inMemoryUserRepository,
       inMemoryTransactionRepository,
+      inMemoryWalletRepository,
       fakeProcessTransferTransactionSchedule,
     );
   });

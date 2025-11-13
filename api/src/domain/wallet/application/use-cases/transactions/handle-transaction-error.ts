@@ -12,6 +12,7 @@ interface UpdateTransactionOnErrorUseCaseRequest {
   transactionId: string;
   status: TransactionStatus;
   fromWalletId?: string;
+  shouldChangeAmount: boolean;
 }
 
 type UpdateTransactionOnErrorUseCaseResponse = Either<
@@ -30,6 +31,7 @@ export class UpdateTransactionOnErrorUseCase {
     status,
     transactionId,
     fromWalletId,
+    shouldChangeAmount,
   }: UpdateTransactionOnErrorUseCaseRequest): Promise<UpdateTransactionOnErrorUseCaseResponse> {
     const transactionExists =
       await this.transactionRepository.findByUniqueField({
@@ -53,8 +55,8 @@ export class UpdateTransactionOnErrorUseCase {
       });
 
       if (wallet) {
-        // Reverte saldo reservado apenas se não for depósito
-        if (transactionExists.type !== TransactionType.DEPOSIT) {
+        // Reverte saldo reservado apenas se shouldChangeAmount for true
+        if (shouldChangeAmount) {
           wallet.balance += transactionExists.amount;
           await this.walletRepository.save(wallet);
         }

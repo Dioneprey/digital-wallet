@@ -3,14 +3,22 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/common/util/format-currency";
 import { formatDate } from "@/common/util/format-date";
-import { Transaction, TransactionType } from "@/services/transactions/type";
+import {
+  ReversalInitiator,
+  Transaction,
+  TransactionStatus,
+  TransactionType,
+} from "@/services/transactions/type";
 import { Skeleton } from "./ui/skeleton";
+import { ReverseTransfer } from "./reverse-transfer";
+import { Wallet } from "@/services/wallet/type";
 
 interface TransactionItemProps {
   transaction: Transaction;
+  userWallet?: Wallet | null;
 }
 
-const TransactionItem = ({ transaction }: TransactionItemProps) => {
+const TransactionItem = ({ transaction, userWallet }: TransactionItemProps) => {
   const getTypeConfig = (type: string) => {
     switch (type) {
       case TransactionType.DEPOSIT:
@@ -44,14 +52,16 @@ const TransactionItem = ({ transaction }: TransactionItemProps) => {
     }
   };
 
-  const getStatusConfig = (status: string) => {
+  const getStatusConfig = (status: TransactionStatus) => {
     switch (status) {
-      case "completed":
+      case TransactionStatus.COMPLETED:
         return { label: "Concluída", variant: "default" as const };
-      case "pending":
+      case TransactionStatus.PENDING:
         return { label: "Pendente", variant: "secondary" as const };
-      case "failed":
+      case TransactionStatus.FAILED:
         return { label: "Falha", variant: "destructive" as const };
+      case TransactionStatus.REVERSED:
+        return { label: "Rervertida", variant: "warning" as const };
       default:
         return { label: status, variant: "default" as const };
     }
@@ -60,7 +70,10 @@ const TransactionItem = ({ transaction }: TransactionItemProps) => {
   const typeConfig = getTypeConfig(transaction.type);
   const statusConfig = getStatusConfig(transaction.status);
   const Icon = typeConfig.icon;
-  const isPositive = transaction.type === TransactionType.DEPOSIT;
+  const userCreatedTransaction = transaction.toWalletId === userWallet?.id;
+  const isPositive =
+    transaction.type === TransactionType.DEPOSIT ||
+    (transaction.type === TransactionType.TRANSFER && userCreatedTransaction);
 
   return (
     <div className="flex items-center justify-between p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors">
@@ -77,6 +90,19 @@ const TransactionItem = ({ transaction }: TransactionItemProps) => {
           <p className="font-medium text-foreground">
             {transaction.description}
           </p>
+          {transaction.reversalReason && (
+            <>
+              <p className="text-sm text-muted-foreground">
+                Revertida: {transaction.reversalReason}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Por:
+                {transaction.reversalInitiator === ReversalInitiator.SYSTEM
+                  ? "Sistema"
+                  : "Usuário"}
+              </p>
+            </>
+          )}
           <div className="flex items-center space-x-2 mt-1">
             <p className="text-sm text-muted-foreground">{typeConfig.label}</p>
             <span className="text-muted-foreground">•</span>
@@ -86,19 +112,30 @@ const TransactionItem = ({ transaction }: TransactionItemProps) => {
           </div>
         </div>
       </div>
-      <div className="text-right space-y-1">
-        <p
-          className={cn(
-            "font-semibold text-lg",
-            isPositive ? "text-success" : "text-red-600"
+      <div className="flex items-center gap-4">
+        {userCreatedTransaction &&
+          transaction.type === TransactionType.TRANSFER &&
+          transaction.status === TransactionStatus.COMPLETED && (
+            <ReverseTransfer transaction={transaction} />
           )}
-        >
-          {isPositive ? "+" : "-"}
-          {formatCurrency(transaction.amount)}
-        </p>
-        <Badge variant={statusConfig.variant} className="text-xs">
-          {statusConfig.label}
-        </Badge>
+        <div className="text-right space-y-1">
+          <p
+            className={cn(
+              "font-semibold text-lg",
+              transaction.status === TransactionStatus.REVERSED
+                ? "text-muted-foreground line-through"
+                : isPositive
+                ? "text-success"
+                : "text-red-600"
+            )}
+          >
+            {isPositive ? "+" : "-"}
+            {formatCurrency(transaction.amount)}
+          </p>
+          <Badge variant={statusConfig.variant} className="text-xs">
+            {statusConfig.label}
+          </Badge>
+        </div>
       </div>
     </div>
   );

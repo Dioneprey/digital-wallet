@@ -9,7 +9,6 @@ import {
 
 import { z } from 'zod';
 import { ZodValidationPipe } from '../../../pipes/zod-validation.pipe';
-import { Public } from 'src/infra/auth/public';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ResourceAlreadyExists } from 'src/domain/wallet/application/use-cases/@errors/resource-already-exists.error';
 import { CreateDepositTransactionUseCase } from 'src/domain/wallet/application/use-cases/transactions/deposit/create-deposit-transaction';

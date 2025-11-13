@@ -1,6 +1,8 @@
+import { PaginationResponse } from 'src/core/types/pagination';
 import {
   UserRepository,
   UserRepositoryFindByUniqueFieldProps,
+  UserRepositoryFindManyProps,
 } from 'src/domain/wallet/application/repositories/user.repository';
 import { User } from 'src/domain/wallet/entities/user';
 
@@ -21,6 +23,36 @@ export class InMemoryUserRepository implements UserRepository {
     }
 
     return user;
+  }
+
+  async findMany({
+    pageIndex = 1,
+    pageSize = 10,
+    filters,
+  }: UserRepositoryFindManyProps): Promise<PaginationResponse<User>> {
+    let orders = [...this.items];
+
+    if (filters) {
+      if (filters.email) {
+        orders = orders.filter((o) => o.email.includes(filters.email || ''));
+      }
+      if (filters.not) {
+        orders = orders.filter((o) => o.id.toString() !== filters.not);
+      }
+    }
+
+    const start = (pageIndex - 1) * pageSize;
+    const paginated = orders.slice(start, start + pageSize);
+
+    const totalCount = orders.length;
+    const totalPages = Math.ceil(totalCount / pageSize);
+
+    return {
+      data: paginated,
+      pageIndex,
+      totalCount,
+      totalPages: totalPages,
+    };
   }
 
   async save(user: User): Promise<User> {

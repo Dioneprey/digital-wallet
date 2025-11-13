@@ -42,7 +42,11 @@ export const request = async ({
   if (!res.ok) {
     return { error: getErrorMessage(parsedRes) };
   }
-  return { error: "", data: parsedRes, rawRes: res };
+  return {
+    error: null,
+    data: parsedRes,
+    rawRes: res,
+  };
 };
 
 export const get = async <T>({

@@ -26,6 +26,12 @@ import {
   BullMQProcessTransferTransactionProcessor,
   PROCESS_TRANSFER_TRANSACTION,
 } from './processor/bullmq-process-transfer-transaction.processor';
+import {
+  BullMQProcessReverseTransactionProcessor,
+  PROCESS_REVERSE_TRANSFER_TRANSACTION,
+} from './processor/bullmq-process-reverse-transfer-transaction.processor';
+import { ProcessReverseTransferTransactionSchedule } from 'src/domain/wallet/application/schedules/process-reverse-transfer-transaction.schedule';
+import { BullMQProcessReverseTransactionScheduleService } from './service/bullmq-process-reverse-transfer-transaction-schedule.service';
 
 @Module({
   imports: [
@@ -52,6 +58,9 @@ import {
     BullModule.registerQueue({
       name: PROCESS_TRANSFER_TRANSACTION,
     }),
+    BullModule.registerQueue({
+      name: PROCESS_REVERSE_TRANSFER_TRANSACTION,
+    }),
 
     BullBoardModule.forRoot({
       route: '/queues',
@@ -69,11 +78,16 @@ import {
       name: PROCESS_TRANSFER_TRANSACTION,
       adapter: BullMQAdapter,
     }),
+    BullBoardModule.forFeature({
+      name: PROCESS_REVERSE_TRANSFER_TRANSACTION,
+      adapter: BullMQAdapter,
+    }),
   ],
   providers: [
     BullMQProcessDepositTransactionProcessor,
     BullMQProcessWithdrawTransactionProcessor,
     BullMQProcessTransferTransactionProcessor,
+    BullMQProcessReverseTransactionProcessor,
     {
       provide: ProcessDepositTransactionSchedule,
       useClass: BullMQProcessDepositTransactionScheduleScheduleService,
@@ -86,12 +100,17 @@ import {
       provide: ProcessWithdrawTransactionSchedule,
       useClass: BullMQProcessWithdrawTransactionScheduleScheduleService,
     },
+    {
+      provide: ProcessReverseTransferTransactionSchedule,
+      useClass: BullMQProcessReverseTransactionScheduleService,
+    },
   ],
   exports: [
     BullModule,
     ProcessDepositTransactionSchedule,
     ProcessTransferTransactionSchedule,
     ProcessWithdrawTransactionSchedule,
+    ProcessReverseTransferTransactionSchedule,
   ],
 })
 export class BullMqConfigModule {}

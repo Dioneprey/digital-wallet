@@ -29,6 +29,9 @@ import { GetMeController } from './controllers/user/me.controller';
 import { MeUseCase } from 'src/domain/wallet/application/use-cases/user/me';
 import { FetchUsersByEmailController } from './controllers/user/fetch-users-by-email.controller';
 import { FetchUsersByEmailUseCase } from 'src/domain/wallet/application/use-cases/user/fetch-users-by-email';
+import { ReverseTransferTransactionUseCase } from 'src/domain/wallet/application/use-cases/transactions/transfer/reverse-transfer-transaction';
+import { ProcessReverseTransferTransactionUseCase } from 'src/domain/wallet/application/use-cases/transactions/transfer/process-reverse-transfer-transaction';
+import { ReverseTransferTransactionController } from './controllers/transaction/transfer/reverse-transfer-transaction.controller';
 
 @Module({
   imports: [
@@ -57,6 +60,7 @@ import { FetchUsersByEmailUseCase } from 'src/domain/wallet/application/use-case
     CreateWithdrawTransactionController,
     CreateTransferTransactionController,
     FetchTransactionsController,
+    ReverseTransferTransactionController,
   ],
   providers: [
     // Atuh
@@ -80,12 +84,15 @@ import { FetchUsersByEmailUseCase } from 'src/domain/wallet/application/use-case
     CreateTransferTransactionUseCase,
     ProcessTransferTransactionUseCase,
     FetchTransactionsUseCase,
+    ReverseTransferTransactionUseCase,
+    ProcessReverseTransferTransactionUseCase,
   ],
   exports: [
     UpdateTransactionOnErrorUseCase,
     ProcessDepositTransactionUseCase,
     ProcessTransferTransactionUseCase,
     ProcessWithdrawTransactionUseCase,
+    ProcessReverseTransferTransactionUseCase,
   ],
 })
 export class HttpModule {}

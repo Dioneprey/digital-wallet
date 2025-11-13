@@ -1,5 +1,4 @@
 import { expect } from 'vitest';
-import { makeCompany } from 'test/factories/make-company';
 import { GetWalletBalanceUseCase } from './get-wallet-balance';
 import { InMemoryWalletRepository } from 'test/repositories/in-memory-wallet.repository';
 import { makeUser } from 'test/factories/make-user';
