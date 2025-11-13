@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/card";
 import { ActionLink } from "./action-link";
 import { Plus, Minus, ArrowLeftRight } from "lucide-react";
-import { Balance } from "../../../components/balance";
+import { ShowBalance } from "./show-balance";
 import { Suspense } from "react";
 
 export async function BalanceCard() {
@@ -22,7 +22,7 @@ export async function BalanceCard() {
               <div className="animate-pulse h-10 w-32 bg-primary-foreground/20 rounded-xl" />
             }
           >
-            <Balance />
+            <ShowBalance />
           </Suspense>
         </div>
       </CardHeader>

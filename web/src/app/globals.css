@@ -84,8 +84,8 @@
 
   --gradient-primary: linear-gradient(
     135deg,
-    oklch(0.488 0.209 233.59) 0%,
-    oklch(0.558 0.382 254.55) 100%
+    oklch(57.19% 0.13868 248.414) 0%,
+    oklch(56.92% 0.22176 265.574) 100%
   );
 
   --gradient-success: linear-gradient(

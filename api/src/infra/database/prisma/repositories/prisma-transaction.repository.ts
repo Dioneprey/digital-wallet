@@ -73,6 +73,7 @@ export class PrismaTransactionRepository implements TransactionRepository {
       baseKey: `transaction:all:wallet:${filters!.walletId}${pageIndex}:${pageSize}`,
       filters,
     });
+
     const cached =
       await this.redisRepository.get<PaginationResponse<PrismaTransaction>>(
         cacheKey,
@@ -135,7 +136,7 @@ export class PrismaTransactionRepository implements TransactionRepository {
       }),
     ]);
 
-    const totalPages = Math.ceil(totalCount / 10);
+    const totalPages = Math.ceil(totalCount / (pageSize || 0));
 
     const paginatedResponsed = {
       data: transactions,
@@ -190,9 +191,6 @@ export class PrismaTransactionRepository implements TransactionRepository {
     walletKeys.forEach((key) => {
       promises.push(
         this.redisRepository.purgeByPrefix(`wallet:${key}:${walletData[key]}`),
-        this.redisRepository.purgeByPrefix(
-          `transaction:all:wallet:${wallet.id.toString()}`,
-        ),
       );
     });
     transactionKeys.forEach((key) => {
@@ -209,6 +207,11 @@ export class PrismaTransactionRepository implements TransactionRepository {
         ),
       );
     });
+    promises.push(
+      this.redisRepository.purgeByPrefix(
+        `transaction:all:wallet:${wallet.id.toString()}`,
+      ),
+    );
 
     await Promise.all(promises);
 
@@ -265,14 +268,16 @@ export class PrismaTransactionRepository implements TransactionRepository {
         this.redisRepository.purgeByPrefix(
           `wallet:${key}:${fromWalletData[key]}`,
         ),
-        this.redisRepository.purgeByPrefix(
-          `transaction:all:wallet:${fromWallet.id.toString()}`,
-        ),
-        this.redisRepository.purgeByPrefix(
-          `transaction:all:wallet:${toWallet.id.toString()}`,
-        ),
       );
     });
+    promises.push(
+      this.redisRepository.purgeByPrefix(
+        `transaction:all:wallet:${fromWallet.id.toString()}`,
+      ),
+      this.redisRepository.purgeByPrefix(
+        `transaction:all:wallet:${toWallet.id.toString()}`,
+      ),
+    );
     transactionKeys.forEach((key) => {
       promises.push(
         this.redisRepository.purgeByPrefix(

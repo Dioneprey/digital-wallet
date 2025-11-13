@@ -83,7 +83,7 @@ export class CreateTransferTransactionUseCase {
     const transaction = Transaction.create({
       type: TransactionType.TRANSFER,
       amount,
-      description: description ?? 'Transferência',
+      description: description || 'Transferência feita',
       status: TransactionStatus.PENDING,
       fromWalletId: fromUserExists.wallet.id,
       toWalletId: toUserExists.wallet.id,

@@ -1,16 +1,21 @@
-import { getWallet } from "@/services/wallet";
-import { ToggleBalance } from "./toggle-balance";
+import { formatCurrency } from "@/common/util/format-currency";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export async function Balance({
-  color = "WHITE",
-  size = "LARGE",
-}: {
-  size?: "SMALL" | "LARGE";
-  color?: "BLACK" | "WHITE";
-}) {
-  const walletBalance = await getWallet();
+interface BalanceProps {
+  balance?: number;
+}
 
-  return (
-    <ToggleBalance balance={walletBalance?.balance} color={color} size={size} />
-  );
+export function Balance({ balance }: BalanceProps) {
+  if (balance !== undefined) {
+    return (
+      <div className="p-4 rounded-lg bg-muted">
+        <p className="text-sm text-muted-foreground mb-1">Saldo atual</p>
+        <p className="text-2xl font-bold text-foreground">
+          {formatCurrency(balance)}
+        </p>
+      </div>
+    );
+  } else {
+    return <Skeleton className="h-[87px] w-full rounded-xl" />;
+  }
 }

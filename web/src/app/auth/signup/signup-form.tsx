@@ -129,7 +129,7 @@ function SubmitButton() {
   const status = useFormStatus();
 
   return (
-    <Button className="w-full" type="submit">
+    <Button disabled={status.pending} className="w-full" type="submit">
       {status.pending ? <LoaderCircle className="animate-spin" /> : "Continuar"}
     </Button>
   );

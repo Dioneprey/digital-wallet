@@ -51,7 +51,7 @@ export class CreateDepositTransactionUseCase {
     const transaction = Transaction.create({
       type: TransactionType.DEPOSIT,
       amount,
-      description: description ?? 'Depósito em conta',
+      description: description || 'Depósito em conta',
       status: TransactionStatus.PENDING,
       toWalletId: userExists.wallet.id,
     });

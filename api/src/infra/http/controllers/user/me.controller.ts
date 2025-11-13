@@ -12,7 +12,7 @@ import { MeUseCase } from 'src/domain/wallet/application/use-cases/user/me';
 import { ResourceNotFoundError } from 'src/domain/wallet/application/use-cases/@errors/resource-not-found.error';
 import { UserPresenter } from '../../presenters/user-presenter';
 
-@ApiTags('user')
+@ApiTags('users')
 @Controller('/me')
 export class GetMeController {
   constructor(private meUseCase: MeUseCase) {}
@@ -27,9 +27,11 @@ export class GetMeController {
     description: 'Usuário autenticado retornado com sucesso',
     schema: {
       example: {
-        sub: 'user-id-123',
-        iat: 1762824338,
-        exp: 1762825238,
+        id: '123',
+        name: 'João da Silva',
+        email: 'joao.silva@example.com',
+        createdAt: '2025-11-12T18:00:00.000Z',
+        updatedAt: '2025-11-12T18:30:00.000Z',
       },
     },
   })
@@ -44,7 +46,6 @@ export class GetMeController {
     const result = await this.meUseCase.execute({
       userId: user.sub,
     });
-    console.log(result.value);
 
     if (result.isLeft()) {
       const error = result.value;

@@ -87,7 +87,6 @@ describe('Create transfer transaction', () => {
       toUserId: user.id.toString(),
       amount: 1000,
     });
-    console.log(result.isLeft());
 
     expect(result.isLeft()).toBeTruthy();
     expect(result.value).toBeInstanceOf(ResourceInvalidError);

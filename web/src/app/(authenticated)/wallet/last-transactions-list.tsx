@@ -4,7 +4,9 @@ import { CardContent } from "@/components/ui/card";
 import { fetchTransactions } from "@/services/transactions";
 
 export async function LastTranscationsList() {
-  const { transactions } = await fetchTransactions({});
+  const { transactions } = await fetchTransactions({
+    pageSize: 10,
+  });
 
   return (
     <CardContent className="space-y-3">

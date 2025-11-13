@@ -7,7 +7,7 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import TransactionsList from "./transaction-list";
+import { TransactionsList } from "./transaction-list";
 import {
   TransactionStatus,
   TransactionType,
@@ -18,9 +18,13 @@ import { TransactionItemSkeleton } from "@/components/transaction-item";
 export default async function Transactions({
   searchParams,
 }: {
-  searchParams: { status?: TransactionStatus; type?: TransactionType };
+  searchParams: {
+    status?: TransactionStatus;
+    type?: TransactionType;
+    pageIndex?: string;
+  };
 }) {
-  const { status, type } = await searchParams;
+  const { status, type, pageIndex } = await searchParams;
 
   return (
     <div className="min-h-screen bg-background">
@@ -47,7 +51,11 @@ export default async function Transactions({
                 />
               ))}
             >
-              <TransactionsList status={status} type={type} />
+              <TransactionsList
+                status={status}
+                type={type}
+                pageIndex={pageIndex}
+              />
             </Suspense>
           </CardContent>
         </Card>

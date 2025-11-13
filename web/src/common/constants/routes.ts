@@ -11,4 +11,8 @@ export const unauthenticatedRoutes = [
     title: "Sign Up",
     path: "/auth/signup",
   },
+  {
+    title: "Index",
+    path: "/",
+  },
 ];

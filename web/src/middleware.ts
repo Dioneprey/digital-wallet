@@ -69,6 +69,8 @@ export async function middleware(request: NextRequest) {
         });
       });
 
+      userIsAuthenticated = await authenticated();
+
       return res;
     }
   }
@@ -77,7 +79,7 @@ export async function middleware(request: NextRequest) {
     return Response.redirect(new URL("/auth/login", request.url));
   }
 
-  if ((userIsAuthenticated && path.startsWith("/auth")) || path === "/") {
+  if (userIsAuthenticated && path.startsWith("/auth")) {
     return Response.redirect(new URL("/wallet", request.url));
   }
 }

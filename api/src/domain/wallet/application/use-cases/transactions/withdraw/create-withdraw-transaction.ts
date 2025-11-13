@@ -63,7 +63,7 @@ export class CreateWithdrawTransactionUseCase {
     const transaction = Transaction.create({
       type: TransactionType.WITHDRAW,
       amount,
-      description: description ?? 'Retirada em conta',
+      description: description || 'Retirada em conta',
       status: TransactionStatus.PENDING,
       fromWalletId: userExists.wallet.id,
     });

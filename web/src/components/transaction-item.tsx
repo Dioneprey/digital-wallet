@@ -13,21 +13,21 @@ interface TransactionItemProps {
 const TransactionItem = ({ transaction }: TransactionItemProps) => {
   const getTypeConfig = (type: string) => {
     switch (type) {
-      case "deposit":
+      case TransactionType.DEPOSIT:
         return {
           icon: ArrowDownLeft,
           label: "Depósito",
           bgColor: "bg-green-100",
           iconColor: "text-green-600",
         };
-      case "withdraw":
+      case TransactionType.WITHDRAW:
         return {
           icon: ArrowUpRight,
           label: "Saque",
           bgColor: "bg-destructive/10",
           iconColor: "text-destructive",
         };
-      case "transfer":
+      case TransactionType.TRANSFER:
         return {
           icon: ArrowLeftRight,
           label: "Transferência",

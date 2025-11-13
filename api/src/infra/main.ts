@@ -52,11 +52,10 @@ async function bootstrap() {
     parseOptions: {},
   });
 
-  // CORS liberado para todas as origens pelo o contexto do desafio técnico.
-  // Em produção, deve-se restringir aos domínios autorizados.
   app.enableCors({
-    origin: ['*'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    origin: ['http://localhost:3000'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   });
 
   if (sentryDsn) {

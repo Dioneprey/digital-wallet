@@ -5,17 +5,23 @@ import {
   TransactionType,
 } from "@/services/transactions/type";
 import { EmptyTransactions } from "@/components/empty-transactions";
+import { TransactionsPagination } from "./transactions-pagination";
 
-export default async function TransactionsList({
+export async function TransactionsList({
   status,
   type,
+  pageIndex,
 }: {
   status?: TransactionStatus;
   type?: TransactionType;
+  pageIndex?: string;
 }) {
-  const { transactions } = await fetchTransactions({
+  const { transactions, meta } = await fetchTransactions({
     status: status,
     type: type,
+    pageSize: 5,
+    pageIndex:
+      pageIndex && !isNaN(Number(pageIndex)) ? Number(pageIndex) : undefined,
   });
 
   return (
@@ -27,6 +33,7 @@ export default async function TransactionsList({
       ) : (
         <EmptyTransactions />
       )}
+      <TransactionsPagination meta={meta} />
     </>
   );
 }

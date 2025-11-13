@@ -26,8 +26,8 @@ const RegisterUserBodySchema = z.object({
 type RegisterUserBodySchema = z.infer<typeof RegisterUserBodySchema>;
 const bodyValidationPipe = new ZodValidationPipe(RegisterUserBodySchema);
 
-@ApiTags('user')
-@Controller('/user')
+@ApiTags('users')
+@Controller('/users')
 @Public()
 export class RegisterUserController {
   constructor(

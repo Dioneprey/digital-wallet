@@ -1,113 +1,112 @@
 "use client";
-import { formatCurrency } from "@/common/util/format-currency";
 import { Button } from "@/components/ui/button";
-import { CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/text-area";
-import { DollarSign } from "lucide-react";
+import { DollarSign, LoaderCircle } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useActionState, useEffect, useState } from "react";
+import { createDeposit } from "./actions/deposit";
+import { useFormStatus } from "react-dom";
+import { FormErrors } from "@/common/interfaces/form-response.interface";
+import { AmountInput } from "@/components/amount-input";
+import { formatCurrency } from "@/common/util/format-currency";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
-export function DepositForm() {
+interface DepositFormProps {
+  balance?: number;
+}
+
+export function DepositForm({ balance }: DepositFormProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
-  const [formData, setFormData] = useState({
-    amount: "",
-    description: "",
+  const [amount, setAmount] = useState<number>(0);
+  const [errors, setErrors] = useState<FormErrors>({});
+
+  const [actionState, formAction] = useActionState(createDeposit, {
+    errors: null,
+    success: false,
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const balance = 10200; // Mock balance
+  useEffect(() => {
+    if (actionState.success) {
+      toast.success("Pedido de depósito realizado com sucesso");
+      setAmount(0);
+      queryClient.invalidateQueries({ queryKey: ["balance"] });
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-
-    const amount = parseFloat(formData.amount);
-    if (!formData.amount || isNaN(amount) || amount <= 0) {
-      newErrors.amount = "Valor inválido";
-    } else if (amount < 1) {
-      newErrors.amount = "Valor mínimo: R$ 1,00";
-    } else if (amount > 500000) {
-      newErrors.amount = "Valor máximo: R$ 5.000,00";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
-    setIsLoading(true);
-
-    setTimeout(() => {
-      toast.success(
-        `${formatCurrency(
-          parseFloat(formData.amount) * 100
-        )} adicionado à sua conta.`
-      );
-      setIsLoading(false);
       router.push("/wallet");
-    }, 1500);
-  };
+    } else if (actionState.errors) {
+      toast.error("Houve um erro ao realizar pedido de depósito");
+
+      setErrors(actionState.errors);
+    }
+  }, [actionState]);
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form action={formAction}>
       <div className="space-y-2">
         <div className="relative">
-          <Input
+          <AmountInput
             id="amount"
-            type="number"
-            label={"Valor do depósito (R$)"}
             icon={<DollarSign />}
-            step="0.01"
+            name="amount"
+            label={"Valor do depósito (R$)"}
             placeholder="0.00"
-            className="pl-10"
-            value={formData.amount}
-            onChange={(e) => {
-              setFormData({ ...formData, amount: e.target.value });
-              setErrors({ ...errors, amount: "" });
+            step="0.01"
+            min={100}
+            error={errors}
+            defaultValue={actionState.payload?.get("amount") as string}
+            onChangeFormatted={(amount) => {
+              if (!isNaN(amount)) {
+                setAmount(amount);
+              } else {
+                setAmount(0);
+              }
+
+              if (errors) {
+                setErrors(null);
+              }
             }}
           />
+          <p
+            className={cn(
+              "text-xs text-muted-foreground",
+              errors && errors?.amount && "pt-3"
+            )}
+          >
+            Valor mínimo: R$ 1,00
+          </p>
         </div>
-        {errors.amount && (
-          <p className="text-sm text-destructive">{errors.amount}</p>
-        )}
-        <p className="text-xs text-muted-foreground">
-          Valor mínimo: R$ 1,00 • Valor máximo: R$ 10.000,00
-        </p>
-      </div>
 
-      <div className="space-y-2">
         <Textarea
           id="description"
+          name="description"
           placeholder="Adicione uma nota sobre este depósito"
           label={`Descrição (opcional)`}
-          value={formData.description}
-          onChange={(e) =>
-            setFormData({ ...formData, description: e.target.value })
-          }
           rows={3}
+          defaultValue={actionState.payload?.get("description") as string}
+          error={errors}
+          onChange={() => {
+            if (errors) {
+              setErrors(null);
+            }
+          }}
         />
-      </div>
 
-      {formData.amount && !errors.amount && parseFloat(formData.amount) > 0 && (
-        <div className="p-4 rounded-lg bg-success/10 border border-success/20">
-          <p className="text-sm text-success-foreground mb-1">
-            Novo saldo após depósito
-          </p>
-          <p className="text-2xl font-bold text-success">
-            {formatCurrency(balance + parseFloat(formData.amount) * 100)}
-          </p>
-        </div>
-      )}
+        {amount > 0 && balance !== undefined && (
+          <div className="p-4 rounded-lg bg-success/10 border border-success/20">
+            <p className="text-sm text-success-foreground mb-1">
+              Novo saldo após depósito
+            </p>
+            <p className="text-2xl font-bold text-success">
+              {formatCurrency(balance + Math.round(amount * 100))}
+            </p>
+          </div>
+        )}
+      </div>
 
       <div className="flex space-x-3 pt-4">
         <Link href="/wallet" className="flex-1">
@@ -115,14 +114,22 @@ export function DepositForm() {
             Cancelar
           </Button>
         </Link>
-        <Button
-          type="submit"
-          className="flex-1 bg-success hover:bg-success/90"
-          disabled={isLoading}
-        >
-          {isLoading ? "Processando..." : "Confirmar depósito"}
-        </Button>
+        <SubmitButton balance={balance} />
       </div>
     </form>
+  );
+}
+
+function SubmitButton({ balance }: DepositFormProps) {
+  const status = useFormStatus();
+
+  return (
+    <Button
+      disabled={balance === undefined || status.pending}
+      className="flex-1"
+      type="submit"
+    >
+      {status.pending ? <LoaderCircle className="animate-spin" /> : "Continuar"}
+    </Button>
   );
 }

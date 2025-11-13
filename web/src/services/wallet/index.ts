@@ -6,7 +6,7 @@ export async function getWallet() {
     path: "wallet",
     tags: ["wallet"],
   });
-  await new Promise((resolve) => setTimeout(resolve, 5000));
+
   if (!response) {
     throw new Error("Resposta vazia da API");
   }

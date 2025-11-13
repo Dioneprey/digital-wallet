@@ -7,7 +7,7 @@ import { AuthenticateController } from './controllers/auth/authenticate.controll
 import { RefreshTokenController } from './controllers/auth/refresh-token.controller';
 import { RegisterUserController } from './controllers/user/register-user.controller';
 import { CreateDepositTransactionController } from './controllers/transaction/deposit/create-deposit-transaction.controller';
-import { CreateWithdrawTransactionController } from './controllers/transaction/withdraw/withdraw-transaction.controller';
+import { CreateWithdrawTransactionController } from './controllers/transaction/withdraw/create-withdraw-transaction.controller';
 import { CreateTransferTransactionController } from './controllers/transaction/transfer/create-transfer-transaction.controller';
 import { GetWalletBalanceController } from './controllers/wallet/get-wallet-balance.controller';
 import { AuthenticateUseCase } from 'src/domain/wallet/application/use-cases/auth/authenticate';
@@ -27,6 +27,8 @@ import { FetchTransactionsUseCase } from 'src/domain/wallet/application/use-case
 import { FetchTransactionsController } from './controllers/transaction/fetch-transactions.controller';
 import { GetMeController } from './controllers/user/me.controller';
 import { MeUseCase } from 'src/domain/wallet/application/use-cases/user/me';
+import { FetchUsersByEmailController } from './controllers/user/fetch-users-by-email.controller';
+import { FetchUsersByEmailUseCase } from 'src/domain/wallet/application/use-cases/user/fetch-users-by-email';
 
 @Module({
   imports: [
@@ -45,6 +47,7 @@ import { MeUseCase } from 'src/domain/wallet/application/use-cases/user/me';
     // User
     RegisterUserController,
     GetMeController,
+    FetchUsersByEmailController,
 
     // Wallet
     GetWalletBalanceController,
@@ -63,6 +66,7 @@ import { MeUseCase } from 'src/domain/wallet/application/use-cases/user/me';
     // User
     RegisterUserUseCase,
     MeUseCase,
+    FetchUsersByEmailUseCase,
 
     // Wallet
     GetWalletBalanceUseCase,

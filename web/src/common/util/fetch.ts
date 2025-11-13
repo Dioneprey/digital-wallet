@@ -63,6 +63,7 @@ export const get = async <T>({
   const headers = await getHeaders();
 
   let res = await fetch(url, {
+    credentials: "include",
     headers: { ...headers },
     next: { tags },
   });

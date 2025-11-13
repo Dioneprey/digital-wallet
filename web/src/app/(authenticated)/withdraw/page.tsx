@@ -6,7 +6,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { ArrowDownLeft } from "lucide-react";
-import { WithdrawForm } from "./withdraw-form";
+import { WithdrawCard } from "./withdraw-card";
 
 export default function Withdraw() {
   return (
@@ -28,7 +28,7 @@ export default function Withdraw() {
               </div>
             </div>
           </CardHeader>
-          <WithdrawForm />
+          <WithdrawCard />
         </Card>
       </main>
     </div>

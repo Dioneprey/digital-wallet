@@ -5,35 +5,16 @@ import {
   CodeRepositoryFindByUniqueFieldProps,
 } from 'src/domain/wallet/application/repositories/code.repository';
 import { PrismaService } from '../prisma.service';
-import { Code, CodeKey } from 'src/domain/wallet/entities/code';
-import {
-  CodeWithInclude,
-  PrismaCodeMapper,
-} from '../mappers/prisma-code.mapper';
-import { RedisRepository } from '../../redis/redis.service';
-import { buildCacheKey } from 'src/core/helpers/buid-cache-key';
-
-const codeKeys: CodeKey[] = ['id', 'value'];
+import { Code } from 'src/domain/wallet/entities/code';
+import { PrismaCodeMapper } from '../mappers/prisma-code.mapper';
 
 @Injectable()
 export class PrismaCodeRepository implements CodeRepository {
-  constructor(
-    private prisma: PrismaService,
-    private redisRepository: RedisRepository,
-  ) {}
+  constructor(private prisma: PrismaService) {}
   async findByUniqueField({
     key,
     value,
   }: CodeRepositoryFindByUniqueFieldProps) {
-    const cacheKey = buildCacheKey({
-      baseKey: `code:${key}:${value}`,
-    });
-    const cached = await this.redisRepository.get<CodeWithInclude>(cacheKey);
-
-    if (cached) {
-      return PrismaCodeMapper.toDomain(cached);
-    }
-
     const prismaCode = await this.prisma.code.findFirst({
       where: {
         [key]: value,
@@ -43,8 +24,6 @@ export class PrismaCodeRepository implements CodeRepository {
     if (!prismaCode) {
       return null;
     }
-
-    await this.redisRepository.set(cacheKey, prismaCode, 180);
 
     return PrismaCodeMapper.toDomain(prismaCode);
   }
@@ -71,12 +50,6 @@ export class PrismaCodeRepository implements CodeRepository {
 
     const promises: Promise<any>[] = [];
 
-    codeKeys.forEach((key) => {
-      promises.push(
-        this.redisRepository.purgeByPrefix(`code:${key}:${data[key]}`),
-      );
-    });
-
     await Promise.all(promises);
 
     return PrismaCodeMapper.toDomain(editedCode);
@@ -92,8 +65,6 @@ export class PrismaCodeRepository implements CodeRepository {
         type,
       },
     });
-
-    await this.redisRepository.purgeByPrefix(`code`);
   }
 
   async delete(code: Code) {
@@ -106,12 +77,6 @@ export class PrismaCodeRepository implements CodeRepository {
     });
 
     const promises: Promise<any>[] = [];
-
-    codeKeys.forEach((key) => {
-      promises.push(
-        this.redisRepository.purgeByPrefix(`code:${key}:${data[key]}`),
-      );
-    });
 
     await Promise.all(promises);
   }

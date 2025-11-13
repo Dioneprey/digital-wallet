@@ -21,20 +21,20 @@ import { FormErrors } from "@/common/interfaces/form-response.interface";
 export default function LoginForm() {
   const router = useRouter();
 
-  const [state, formAction] = useActionState(validateCredentials, {
-    errors: {},
+  const [actionState, formAction] = useActionState(validateCredentials, {
+    errors: null,
     success: false,
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
 
   useEffect(() => {
-    if (state.success) {
+    if (actionState.success) {
       router.push("/wallet");
-    } else if (state.errors) {
-      setErrors(state.errors);
+    } else if (actionState.errors) {
+      setErrors(actionState.errors);
     }
-  }, [state]);
+  }, [actionState]);
 
   return (
     <Card>
@@ -45,12 +45,12 @@ export default function LoginForm() {
       <CardContent className="space-y-4">
         <form action={formAction} className="w-full space-y-4">
           <Input
-            error={errors}
             name="email"
             label="E-mail"
             type="email"
             icon={<Mail size={20} />}
             placeholder="E-mail"
+            error={errors}
             onChange={() => {
               if (errors) {
                 setErrors(null);
@@ -92,7 +92,7 @@ function SubmitButton() {
   const status = useFormStatus();
 
   return (
-    <Button className="w-full" type="submit">
+    <Button disabled={status.pending} className="w-full" type="submit">
       {status.pending ? <LoaderCircle className="animate-spin" /> : "Continuar"}
     </Button>
   );
