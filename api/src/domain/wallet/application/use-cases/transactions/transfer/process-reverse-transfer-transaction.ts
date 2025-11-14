@@ -30,7 +30,7 @@ export class ProcessReverseTransferTransactionUseCase {
     private walletRepository: WalletRepository,
     private transactionRepository: TransactionRepository,
     private createNotificationSchedule: CreateNotificationSchedule,
-    private notificationGateway: NotificationGateway,
+    private notificationGateway?: NotificationGateway,
   ) {}
 
   async execute({
@@ -101,7 +101,7 @@ export class ProcessReverseTransferTransactionUseCase {
         },
       }),
       this.createNotificationSchedule.enqueueJob({
-        userId: fromWalletExists.userId.toString(),
+        userId: toWalletExists.userId.toString(),
         title: 'Transferência revertida',
         variables: {
           amount: transactionExists.amount,
@@ -110,12 +110,14 @@ export class ProcessReverseTransferTransactionUseCase {
       }),
     ]);
 
-    this.notificationGateway.newTransaction({
-      userId: fromWalletExists.user.id.toString(),
-    });
-    this.notificationGateway.newTransaction({
-      userId: toWalletExists.user.id.toString(),
-    });
+    if (this.notificationGateway) {
+      this.notificationGateway.newTransaction({
+        userId: fromWalletExists.user.id.toString(),
+      });
+      this.notificationGateway.newTransaction({
+        userId: toWalletExists.user.id.toString(),
+      });
+    }
 
     return right(undefined);
   }

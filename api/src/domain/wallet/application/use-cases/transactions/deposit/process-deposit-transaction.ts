@@ -24,7 +24,7 @@ export class ProcessDepositTransactionUseCase {
     private walletRepository: WalletRepository,
     private transactionRepository: TransactionRepository,
     private createNotificationSchedule: CreateNotificationSchedule,
-    private notificationGateway: NotificationGateway,
+    private notificationGateway?: NotificationGateway,
   ) {}
 
   async execute({
@@ -76,9 +76,11 @@ export class ProcessDepositTransactionUseCase {
       },
     });
 
-    this.notificationGateway.newTransaction({
-      userId: walletExists.userId.toString(),
-    });
+    if (this.notificationGateway) {
+      this.notificationGateway.newTransaction({
+        userId: walletExists.userId.toString(),
+      });
+    }
 
     return right(undefined);
   }

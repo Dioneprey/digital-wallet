@@ -26,7 +26,7 @@ export class ProcessTransferTransactionUseCase {
     private walletRepository: WalletRepository,
     private transactionRepository: TransactionRepository,
     private createNotificationSchedule: CreateNotificationSchedule,
-    private notificationGateway: NotificationGateway,
+    private notificationGateway?: NotificationGateway,
   ) {}
 
   async execute({
@@ -102,7 +102,7 @@ export class ProcessTransferTransactionUseCase {
         },
       }),
       this.createNotificationSchedule.enqueueJob({
-        userId: fromWalletExists.userId.toString(),
+        userId: toWalletExists.userId.toString(),
         title: 'Transferência recebida',
         variables: {
           amount: transactionExists.amount,
@@ -111,12 +111,14 @@ export class ProcessTransferTransactionUseCase {
       }),
     ]);
 
-    this.notificationGateway.newTransaction({
-      userId: fromWalletExists.user.id.toString(),
-    });
-    this.notificationGateway.newTransaction({
-      userId: toWalletExists.user.id.toString(),
-    });
+    if (this.notificationGateway) {
+      this.notificationGateway.newTransaction({
+        userId: fromWalletExists.user.id.toString(),
+      });
+      this.notificationGateway.newTransaction({
+        userId: toWalletExists.user.id.toString(),
+      });
+    }
 
     return right(undefined);
   }

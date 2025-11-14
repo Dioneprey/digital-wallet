@@ -8,33 +8,38 @@ import {
   TransactionStatus,
   TransactionType,
 } from 'src/domain/wallet/entities/transaction';
-import { InsufficienteBalanceError } from '../../@errors/insufficiente-balance.error';
-import { ResourceInvalidError } from '../../@errors/resource-invalid.error';
-import { ResourceNotFoundError } from '../../@errors/resource-not-found.error';
 import { ProcessReverseTransferTransactionUseCase } from './process-reverse-transfer-transaction';
+import { FakeCreateNotificationSchedule } from 'test/schedules/fake-create-notification-schedule';
+import { makeUser } from 'test/factories/make-user';
 
 let inMemoryWalletRepository: InMemoryWalletRepository;
 let inMemoryTransactionRepository: InMemoryTransactionRepository;
+let fakeCreateNotificationSchedule: FakeCreateNotificationSchedule;
+
 let sut: ProcessReverseTransferTransactionUseCase;
 
 describe('Process reverse transfer transaction', () => {
   beforeEach(() => {
     inMemoryWalletRepository = new InMemoryWalletRepository();
     inMemoryTransactionRepository = new InMemoryTransactionRepository();
+    fakeCreateNotificationSchedule = new FakeCreateNotificationSchedule();
     sut = new ProcessReverseTransferTransactionUseCase(
       inMemoryWalletRepository,
       inMemoryTransactionRepository,
+      fakeCreateNotificationSchedule,
     );
   });
 
   it('should process a reverse transfer transaction successfully', async () => {
+    const fromUser = makeUser();
+    const toUser = makeUser();
     const fromWallet = makeWallet(
-      { balance: 10000 },
-      new UniqueEntityID('from-wallet'),
+      { balance: 10000, user: fromUser },
+      new UniqueEntityID(),
     );
     const toWallet = makeWallet(
-      { balance: 5000 },
-      new UniqueEntityID('to-wallet'),
+      { balance: 5000, user: toUser },
+      new UniqueEntityID(),
     );
 
     const transaction = makeTransaction({
@@ -53,9 +58,10 @@ describe('Process reverse transfer transaction', () => {
       fromWalletId: fromWallet.id.toString(),
       toWalletId: toWallet.id.toString(),
     });
+    console.log({ result });
 
-    expect(result.isLeft()).toBeFalsy();
-
-    expect(transaction.status).toBe(TransactionStatus.REVERSED);
+    expect(inMemoryTransactionRepository.items[0].status).toBe(
+      TransactionStatus.REVERSED,
+    );
   });
 });

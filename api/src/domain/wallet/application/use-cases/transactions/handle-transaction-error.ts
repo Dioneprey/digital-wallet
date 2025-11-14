@@ -28,7 +28,7 @@ export class UpdateTransactionOnErrorUseCase {
     private transactionRepository: TransactionRepository,
     private walletRepository: WalletRepository,
     private createNotificationSchedule: CreateNotificationSchedule,
-    private notificationGateway: NotificationGateway,
+    private notificationGateway?: NotificationGateway,
   ) {}
 
   async execute({
@@ -70,9 +70,11 @@ export class UpdateTransactionOnErrorUseCase {
             type: transactionExists.type,
           },
         });
-        this.notificationGateway.newTransaction({
-          userId: wallet.userId.toString(),
-        });
+        if (this.notificationGateway) {
+          this.notificationGateway.newTransaction({
+            userId: wallet.userId.toString(),
+          });
+        }
         // Reverte saldo reservado apenas se shouldChangeAmount for true
         if (shouldChangeAmount) {
           wallet.balance += transactionExists.amount;

@@ -25,7 +25,7 @@ export class ProcessWithdrawTransactionUseCase {
     private walletRepository: WalletRepository,
     private transactionRepository: TransactionRepository,
     private createNotificationSchedule: CreateNotificationSchedule,
-    private notificationGateway: NotificationGateway,
+    private notificationGateway?: NotificationGateway,
   ) {}
 
   async execute({
@@ -71,18 +71,20 @@ export class ProcessWithdrawTransactionUseCase {
       transaction: transactionExists,
       wallet: walletExists,
     });
-    await new Promise((resolve) => setTimeout(resolve, 6000));
-    // this.createNotificationSchedule.enqueueJob({
-    //   userId: walletExists.userId.toString(),
-    //   title: 'Saque confirmado',
-    //   variables: {
-    //     amount: transactionExists.amount,
-    //   },
-    // });
-    throw new Error('sim');
-    // this.notificationGateway.newTransaction({
-    //   userId: walletExists.userId.toString(),
-    // });
+
+    this.createNotificationSchedule.enqueueJob({
+      userId: walletExists.userId.toString(),
+      title: 'Saque confirmado',
+      variables: {
+        amount: transactionExists.amount,
+      },
+    });
+
+    if (this.notificationGateway) {
+      this.notificationGateway.newTransaction({
+        userId: walletExists.userId.toString(),
+      });
+    }
 
     return right(undefined);
   }

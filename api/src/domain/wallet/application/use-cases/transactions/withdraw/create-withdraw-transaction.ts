@@ -84,8 +84,8 @@ export class CreateWithdrawTransactionUseCase {
         jobId: transaction.id.toString(),
         removeOnComplete: false,
         removeOnFail: false,
-        // attempts: 3,
-        // backoff: { type: 'exponential', delay: 2000 },
+        attempts: 3,
+        backoff: { type: 'exponential', delay: 2000 },
       },
     );
 
