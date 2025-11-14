@@ -1,0 +1,7 @@
+include:
+  - api/docker-compose.yml
+  - web/docker-compose.yml
+
+networks:
+  digital-wallet-network:
+    driver: bridge

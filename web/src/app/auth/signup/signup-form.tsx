@@ -15,10 +15,10 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 import { Checkbox } from "@/components/ui/checkbox";
-import { registerUser } from "../actions/auth";
 import { useRouter } from "next/navigation";
 import { FormErrors } from "@/common/interfaces/form-response.interface";
 import { toast } from "sonner";
+import { registerUser } from "@/actions/auth";
 
 export default function SignupForm() {
   const router = useRouter();

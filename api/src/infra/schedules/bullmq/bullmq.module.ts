@@ -32,11 +32,19 @@ import {
 } from './processor/bullmq-process-reverse-transfer-transaction.processor';
 import { ProcessReverseTransferTransactionSchedule } from 'src/domain/wallet/application/schedules/process-reverse-transfer-transaction.schedule';
 import { BullMQProcessReverseTransactionScheduleService } from './service/bullmq-process-reverse-transfer-transaction-schedule.service';
+import {
+  BullMQCreateNotificationProcessor,
+  CREATE_NOTIFICATION_SCHEDULE_PROCESSOR,
+} from './processor/create-notification-schedule.processor';
+import { BullMQCreateNotificationScheduleService } from './service/bullmq-create-notification-schedule.service';
+import { CreateNotificationSchedule } from 'src/domain/wallet/application/schedules/create-notification';
+import { EventsModule } from 'src/infra/events/events.module';
 
 @Module({
   imports: [
     DatabaseModule,
     forwardRef(() => HttpModule),
+    EventsModule,
     BullModule.forRootAsync({
       imports: [EnvModule],
       inject: [EnvService],
@@ -61,6 +69,9 @@ import { BullMQProcessReverseTransactionScheduleService } from './service/bullmq
     BullModule.registerQueue({
       name: PROCESS_REVERSE_TRANSFER_TRANSACTION,
     }),
+    BullModule.registerQueue({
+      name: CREATE_NOTIFICATION_SCHEDULE_PROCESSOR,
+    }),
 
     BullBoardModule.forRoot({
       route: '/queues',
@@ -82,12 +93,17 @@ import { BullMQProcessReverseTransactionScheduleService } from './service/bullmq
       name: PROCESS_REVERSE_TRANSFER_TRANSACTION,
       adapter: BullMQAdapter,
     }),
+    BullBoardModule.forFeature({
+      name: CREATE_NOTIFICATION_SCHEDULE_PROCESSOR,
+      adapter: BullMQAdapter,
+    }),
   ],
   providers: [
     BullMQProcessDepositTransactionProcessor,
     BullMQProcessWithdrawTransactionProcessor,
     BullMQProcessTransferTransactionProcessor,
     BullMQProcessReverseTransactionProcessor,
+    BullMQCreateNotificationProcessor,
     {
       provide: ProcessDepositTransactionSchedule,
       useClass: BullMQProcessDepositTransactionScheduleScheduleService,
@@ -104,6 +120,10 @@ import { BullMQProcessReverseTransactionScheduleService } from './service/bullmq
       provide: ProcessReverseTransferTransactionSchedule,
       useClass: BullMQProcessReverseTransactionScheduleService,
     },
+    {
+      provide: CreateNotificationSchedule,
+      useClass: BullMQCreateNotificationScheduleService,
+    },
   ],
   exports: [
     BullModule,
@@ -111,6 +131,7 @@ import { BullMQProcessReverseTransactionScheduleService } from './service/bullmq
     ProcessTransferTransactionSchedule,
     ProcessWithdrawTransactionSchedule,
     ProcessReverseTransferTransactionSchedule,
+    CreateNotificationSchedule,
   ],
 })
 export class BullMqConfigModule {}

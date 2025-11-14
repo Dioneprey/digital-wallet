@@ -7,6 +7,8 @@ import {
 import { ResourceNotFoundError } from '../@errors/resource-not-found.error';
 import { TransactionRepository } from '../../repositories/transaction.repository';
 import { WalletRepository } from '../../repositories/wallet.repository';
+import { CreateNotificationSchedule } from '../../schedules/create-notification';
+import { NotificationGateway } from 'src/infra/events/gateways/socket/notification.gateway';
 
 interface UpdateTransactionOnErrorUseCaseRequest {
   transactionId: string;
@@ -25,6 +27,8 @@ export class UpdateTransactionOnErrorUseCase {
   constructor(
     private transactionRepository: TransactionRepository,
     private walletRepository: WalletRepository,
+    private createNotificationSchedule: CreateNotificationSchedule,
+    private notificationGateway?: NotificationGateway,
   ) {}
 
   async execute({
@@ -52,9 +56,25 @@ export class UpdateTransactionOnErrorUseCase {
       const wallet = await this.walletRepository.findByUniqueField({
         key: 'id',
         value: fromWalletId,
+        include: {
+          user: true,
+        },
       });
 
       if (wallet) {
+        this.createNotificationSchedule.enqueueJob({
+          userId: wallet.userId.toString(),
+          title: 'Operação falhou',
+          variables: {
+            amount: transactionExists.amount,
+            type: transactionExists.type,
+          },
+        });
+        if (this.notificationGateway) {
+          this.notificationGateway.newTransaction({
+            userId: wallet.userId.toString(),
+          });
+        }
         // Reverte saldo reservado apenas se shouldChangeAmount for true
         if (shouldChangeAmount) {
           wallet.balance += transactionExists.amount;

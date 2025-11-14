@@ -12,18 +12,22 @@ import { ResourceNotFoundError } from '../../@errors/resource-not-found.error';
 import { ResourceInvalidError } from '../../@errors/resource-invalid.error';
 import { InsufficienteBalanceError } from '../../@errors/insufficiente-balance.error';
 import { ProcessWithdrawTransactionUseCase } from './process-withdraw-deposit-transaction';
+import { FakeCreateNotificationSchedule } from 'test/schedules/fake-create-notification-schedule';
 
 let inMemoryWalletRepository: InMemoryWalletRepository;
 let inMemoryTransactionRepository: InMemoryTransactionRepository;
+let fakeCreateNotificationSchedule: FakeCreateNotificationSchedule;
 let sut: ProcessWithdrawTransactionUseCase;
 
 describe('Process withdraw transaction', () => {
   beforeEach(() => {
     inMemoryWalletRepository = new InMemoryWalletRepository();
     inMemoryTransactionRepository = new InMemoryTransactionRepository();
+    fakeCreateNotificationSchedule = new FakeCreateNotificationSchedule();
     sut = new ProcessWithdrawTransactionUseCase(
       inMemoryWalletRepository,
       inMemoryTransactionRepository,
+      fakeCreateNotificationSchedule,
     );
   });
 

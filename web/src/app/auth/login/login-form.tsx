@@ -3,7 +3,6 @@
 import { useActionState, useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { validateCredentials } from "../actions/auth";
 import { useFormStatus } from "react-dom";
 import { LoaderCircle, Lock, Mail } from "lucide-react";
 import {
@@ -18,6 +17,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormErrors } from "@/common/interfaces/form-response.interface";
 import { toast } from "sonner";
+import { validateCredentials } from "@/actions/auth";
+import { getWallet } from "@/services/wallet";
+import { useQuery } from "@tanstack/react-query";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -28,7 +30,10 @@ export default function LoginForm() {
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
-
+  const { data: walletData } = useQuery({
+    queryKey: ["balance"],
+    queryFn: () => getWallet(),
+  });
   useEffect(() => {
     if (actionState.success) {
       router.push("/wallet");

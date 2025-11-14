@@ -9,6 +9,7 @@ services:
     environment:
       - DATABASE_URL=postgres://${DATABASE_USER}:${DATABASE_USER}@database:5432/${DATABASE_NAME}
       - REDIS_HOST=redis
+      - CORS_ORIGIN=http://web:3000
       - REDIS_PORT=6379
       - JAEGER_URL=http://jaeger:4318/v1/traces
     ports:
@@ -73,7 +74,3 @@ services:
 volumes:
   postgres_data:
   redis_data:
-
-networks:
-  digital-wallet-network:
-    driver: bridge

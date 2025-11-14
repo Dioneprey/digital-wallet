@@ -9,18 +9,22 @@ import {
 } from 'src/domain/wallet/entities/transaction';
 import { ResourceNotFoundError } from '../@errors/resource-not-found.error';
 import { UpdateTransactionOnErrorUseCase } from './handle-transaction-error';
+import { FakeCreateNotificationSchedule } from 'test/schedules/fake-create-notification-schedule';
 
 let inMemoryTransactionRepository: InMemoryTransactionRepository;
 let inMemoryWalletRepository: InMemoryWalletRepository;
+let fakeCreateNotificationSchedule: FakeCreateNotificationSchedule;
 let sut: UpdateTransactionOnErrorUseCase;
 
 describe('Update Transaction On Error', () => {
   beforeEach(() => {
     inMemoryTransactionRepository = new InMemoryTransactionRepository();
     inMemoryWalletRepository = new InMemoryWalletRepository();
+    fakeCreateNotificationSchedule = new FakeCreateNotificationSchedule();
     sut = new UpdateTransactionOnErrorUseCase(
       inMemoryTransactionRepository,
       inMemoryWalletRepository,
+      fakeCreateNotificationSchedule,
     );
   });
 

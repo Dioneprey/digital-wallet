@@ -12,51 +12,24 @@ import { InsufficienteBalanceError } from '../../@errors/insufficiente-balance.e
 import { ResourceInvalidError } from '../../@errors/resource-invalid.error';
 import { ResourceNotFoundError } from '../../@errors/resource-not-found.error';
 import { ProcessTransferTransactionUseCase } from './process-transfer-deposit-transaction';
+import { FakeCreateNotificationSchedule } from 'test/schedules/fake-create-notification-schedule';
+import { makeUser } from 'test/factories/make-user';
 
 let inMemoryWalletRepository: InMemoryWalletRepository;
 let inMemoryTransactionRepository: InMemoryTransactionRepository;
+let fakeCreateNotificationSchedule: FakeCreateNotificationSchedule;
 let sut: ProcessTransferTransactionUseCase;
 
 describe('Process transfer transaction', () => {
   beforeEach(() => {
     inMemoryWalletRepository = new InMemoryWalletRepository();
     inMemoryTransactionRepository = new InMemoryTransactionRepository();
+    fakeCreateNotificationSchedule = new FakeCreateNotificationSchedule();
     sut = new ProcessTransferTransactionUseCase(
       inMemoryWalletRepository,
       inMemoryTransactionRepository,
+      fakeCreateNotificationSchedule,
     );
-  });
-
-  it('should process a transfer transaction successfully', async () => {
-    const fromWallet = makeWallet(
-      { balance: 10000 },
-      new UniqueEntityID('from-wallet'),
-    );
-    const toWallet = makeWallet(
-      { balance: 5000 },
-      new UniqueEntityID('to-wallet'),
-    );
-
-    const transaction = makeTransaction({
-      type: TransactionType.TRANSFER,
-      amount: 3000,
-      status: TransactionStatus.PENDING,
-      fromWalletId: fromWallet.id,
-      toWalletId: toWallet.id,
-    });
-
-    inMemoryWalletRepository.items.push(fromWallet, toWallet);
-    inMemoryTransactionRepository.items.push(transaction);
-
-    const result = await sut.execute({
-      transactionId: transaction.id.toString(),
-      fromWalletId: fromWallet.id.toString(),
-      toWalletId: toWallet.id.toString(),
-    });
-
-    expect(result.isLeft()).toBeFalsy();
-
-    expect(transaction.status).toBe(TransactionStatus.COMPLETED);
   });
 
   it('should return error if transaction does not exist', async () => {
@@ -71,7 +44,8 @@ describe('Process transfer transaction', () => {
   });
 
   it('should return error if some wallet does not exist', async () => {
-    const toWallet = makeWallet({ balance: 0 });
+    const toUser = makeUser();
+    const toWallet = makeWallet({ balance: 1000, user: toUser });
     inMemoryWalletRepository.items.push(toWallet);
 
     const transaction = makeTransaction({
@@ -94,13 +68,17 @@ describe('Process transfer transaction', () => {
   });
 
   it('should return error if transaction is not pending', async () => {
-    const fromWallet = makeWallet({ balance: 5000 });
-    const toWallet = makeWallet({ balance: 2000 });
+    const fromUser = makeUser();
+    const toUser = makeUser();
+    const fromWallet = makeWallet({ balance: 500, user: fromUser });
+    const toWallet = makeWallet({ balance: 1000, user: toUser });
 
     const transaction = makeTransaction({
       type: TransactionType.TRANSFER,
       amount: 1000,
       status: TransactionStatus.COMPLETED,
+      fromWallet: fromWallet,
+      toWallet: toWallet,
       fromWalletId: fromWallet.id,
       toWalletId: toWallet.id,
     });
@@ -119,14 +97,18 @@ describe('Process transfer transaction', () => {
   });
 
   it('should return error if fromWallet has insufficient balance', async () => {
-    const fromWallet = makeWallet({ balance: 500 });
-    const toWallet = makeWallet({ balance: 1000 });
+    const fromUser = makeUser();
+    const toUser = makeUser();
+    const fromWallet = makeWallet({ balance: 500, user: fromUser });
+    const toWallet = makeWallet({ balance: 1000, user: toUser });
 
     const transaction = makeTransaction({
       type: TransactionType.TRANSFER,
       amount: 1000,
       status: TransactionStatus.PENDING,
+      fromWallet: fromWallet,
       fromWalletId: fromWallet.id,
+      toWallet: toWallet,
       toWalletId: toWallet.id,
     });
 

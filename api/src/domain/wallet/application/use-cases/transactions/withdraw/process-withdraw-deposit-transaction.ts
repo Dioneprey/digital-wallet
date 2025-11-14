@@ -6,6 +6,8 @@ import { TransactionRepository } from '../../../repositories/transaction.reposit
 import { InsufficienteBalanceError } from '../../@errors/insufficiente-balance.error';
 import { ResourceInvalidError } from '../../@errors/resource-invalid.error';
 import { TransactionStatus } from 'src/domain/wallet/entities/transaction';
+import { CreateNotificationSchedule } from '../../../schedules/create-notification';
+import { NotificationGateway } from 'src/infra/events/gateways/socket/notification.gateway';
 
 interface ProcessWithdrawTransactionUseCaseRequest {
   transactionId: string;
@@ -22,6 +24,8 @@ export class ProcessWithdrawTransactionUseCase {
   constructor(
     private walletRepository: WalletRepository,
     private transactionRepository: TransactionRepository,
+    private createNotificationSchedule: CreateNotificationSchedule,
+    private notificationGateway?: NotificationGateway,
   ) {}
 
   async execute({
@@ -67,6 +71,20 @@ export class ProcessWithdrawTransactionUseCase {
       transaction: transactionExists,
       wallet: walletExists,
     });
+
+    this.createNotificationSchedule.enqueueJob({
+      userId: walletExists.userId.toString(),
+      title: 'Saque confirmado',
+      variables: {
+        amount: transactionExists.amount,
+      },
+    });
+
+    if (this.notificationGateway) {
+      this.notificationGateway.newTransaction({
+        userId: walletExists.userId.toString(),
+      });
+    }
 
     return right(undefined);
   }

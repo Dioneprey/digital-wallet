@@ -35,13 +35,18 @@ export const request = async ({
 
   const res = await fetch(`${API_URL}/${path}`, {
     method,
+    credentials: "include",
     headers: { "Content-Type": "application/json", ...headers },
     body: JSON.stringify(body),
   });
+  console.log({ res });
+
   const parsedRes = await res.json();
   if (!res.ok) {
     return { error: getErrorMessage(parsedRes) };
   }
+  console.log({ parsedRes });
+
   return {
     error: null,
     data: parsedRes,

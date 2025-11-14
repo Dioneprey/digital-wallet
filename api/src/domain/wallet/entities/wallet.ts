@@ -1,13 +1,19 @@
 import { Entity } from 'src/core/entities/entity';
 import { UniqueEntityID } from 'src/core/entities/unique-entity-id';
 import { Optional } from 'src/core/types/optional';
+import { User } from './user';
 
 export type WalletKey = 'id' | 'userId';
+
+export type WalletInclude = {
+  user?: boolean;
+};
 
 export interface WalletProps {
   userId: UniqueEntityID;
   balance: number;
 
+  user?: User;
   createdAt: Date;
   updatedAt?: Date | null;
 }
@@ -27,6 +33,13 @@ export class Wallet extends Entity<WalletProps> {
   set balance(balance: number) {
     this.props.balance = balance;
     this.touch();
+  }
+
+  get user() {
+    return this.props.user;
+  }
+  set user(user: User | undefined) {
+    this.props.user = user;
   }
 
   get createdAt() {

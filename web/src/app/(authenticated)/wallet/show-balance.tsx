@@ -15,7 +15,7 @@ export function ShowBalance({
     queryFn: () => getWallet(),
   });
 
-  if (data?.balance) {
+  if (data?.balance !== undefined) {
     return <ToggleBalance balance={data?.balance} color={color} size={size} />;
   } else {
     return (

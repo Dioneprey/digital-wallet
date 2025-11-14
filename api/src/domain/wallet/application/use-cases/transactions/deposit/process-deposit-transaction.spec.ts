@@ -9,18 +9,23 @@ import {
   TransactionType,
 } from 'src/domain/wallet/entities/transaction';
 import { ResourceInvalidError } from '../../@errors/resource-invalid.error';
+import { FakeCreateNotificationSchedule } from 'test/schedules/fake-create-notification-schedule';
 
 let inMemoryWalletRepository: InMemoryWalletRepository;
 let inMemoryTransactionRepository: InMemoryTransactionRepository;
+let fakeCreateNotificationSchedule: FakeCreateNotificationSchedule;
+
 let sut: ProcessDepositTransactionUseCase;
 
 describe('Process deposit transaction', () => {
   beforeEach(() => {
     inMemoryWalletRepository = new InMemoryWalletRepository();
     inMemoryTransactionRepository = new InMemoryTransactionRepository();
+    fakeCreateNotificationSchedule = new FakeCreateNotificationSchedule();
     sut = new ProcessDepositTransactionUseCase(
       inMemoryWalletRepository,
       inMemoryTransactionRepository,
+      fakeCreateNotificationSchedule,
     );
   });
 

@@ -15,6 +15,7 @@ export const envSchema = z.object({
   DATABASE_PASSWORD: z.string().default('postgres'),
   DATABASE_NAME: z.string().default('postgres'),
   DATABASE_PORT: z.coerce.number().default(5455),
+  CORS_ORIGIN: z.string().default('http://localhost:3000'),
   JAEGER_URL: z.string().default('http://localhost:4318/v1/traces'),
   REDIS_HOST: z.string().optional().default('localhost'),
   REDIS_PORT: z.coerce.number().optional().default(6379),

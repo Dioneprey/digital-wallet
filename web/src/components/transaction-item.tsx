@@ -93,10 +93,10 @@ const TransactionItem = ({ transaction, userWallet }: TransactionItemProps) => {
           {transaction.reversalReason && (
             <>
               <p className="text-sm text-muted-foreground">
-                Revertida: {transaction.reversalReason}
+                Transferência revertida: {transaction.reversalReason}
               </p>
               <p className="text-sm text-muted-foreground">
-                Por:
+                Revertida pelo:
                 {transaction.reversalInitiator === ReversalInitiator.SYSTEM
                   ? "Sistema"
                   : "Usuário"}

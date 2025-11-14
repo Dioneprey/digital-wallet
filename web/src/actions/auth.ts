@@ -2,9 +2,9 @@
 
 import { jwtDecode } from "jwt-decode";
 import { cookies } from "next/headers";
-import { AUTHENTICATION_COOKIE } from "../../../common/constants/auth-cookie";
 import { request } from "@/common/util/fetch";
 import { FormResponse } from "@/common/interfaces/form-response.interface";
+import { AUTHENTICATION_COOKIE } from "@/common/constants/auth-cookie";
 
 export async function validateCredentials(
   _prevState: FormResponse,
@@ -35,6 +35,8 @@ export async function validateCredentials(
 
     return { errors: null, success: true, payload: data };
   } catch (error) {
+    console.log(error);
+
     return {
       errors: { response: "Ocorreu um erro... Tente novamente!" },
       payload: data,
@@ -149,3 +151,19 @@ const setAuthCookie = async (response: Response) => {
     }
   }
 };
+
+export async function logout() {
+  const cookieStore = await cookies();
+
+  // Lista de cookies que você usa para autenticação
+  const authCookies = ["Authentication", "RefreshToken"];
+
+  for (const name of authCookies) {
+    cookieStore.set({
+      name,
+      value: "",
+      path: "/",
+      maxAge: 0,
+    });
+  }
+}

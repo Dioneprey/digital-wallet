@@ -6,6 +6,8 @@ import { TransactionRepository } from '../../../repositories/transaction.reposit
 import { InsufficienteBalanceError } from '../../@errors/insufficiente-balance.error';
 import { ResourceInvalidError } from '../../@errors/resource-invalid.error';
 import { TransactionStatus } from 'src/domain/wallet/entities/transaction';
+import { CreateNotificationSchedule } from '../../../schedules/create-notification';
+import { NotificationGateway } from 'src/infra/events/gateways/socket/notification.gateway';
 
 interface ProcessTransferTransactionUseCaseRequest {
   transactionId: string;
@@ -23,6 +25,8 @@ export class ProcessTransferTransactionUseCase {
   constructor(
     private walletRepository: WalletRepository,
     private transactionRepository: TransactionRepository,
+    private createNotificationSchedule: CreateNotificationSchedule,
+    private notificationGateway?: NotificationGateway,
   ) {}
 
   async execute({
@@ -39,10 +43,16 @@ export class ProcessTransferTransactionUseCase {
         this.walletRepository.findByUniqueField({
           key: 'id',
           value: fromWalletId,
+          include: {
+            user: true,
+          },
         }),
         this.walletRepository.findByUniqueField({
           key: 'id',
           value: toWalletId,
+          include: {
+            user: true,
+          },
         }),
       ]);
 
@@ -52,11 +62,11 @@ export class ProcessTransferTransactionUseCase {
       );
     }
 
-    if (!fromWalletExists) {
+    if (!fromWalletExists || !fromWalletExists.user) {
       return left(new ResourceNotFoundError(`Wallet with id: ${fromWalletId}`));
     }
 
-    if (!toWalletExists) {
+    if (!toWalletExists || !toWalletExists.user) {
       return left(new ResourceNotFoundError(`Wallet with id: ${toWalletId}`));
     }
 
@@ -81,6 +91,34 @@ export class ProcessTransferTransactionUseCase {
       fromWallet: fromWalletExists,
       toWallet: toWalletExists,
     });
+
+    await Promise.all([
+      this.createNotificationSchedule.enqueueJob({
+        userId: fromWalletExists.userId.toString(),
+        title: 'Transferência enviada',
+        variables: {
+          amount: transactionExists.amount,
+          userName: toWalletExists.user.name,
+        },
+      }),
+      this.createNotificationSchedule.enqueueJob({
+        userId: toWalletExists.userId.toString(),
+        title: 'Transferência recebida',
+        variables: {
+          amount: transactionExists.amount,
+          userName: fromWalletExists.user.name,
+        },
+      }),
+    ]);
+
+    if (this.notificationGateway) {
+      this.notificationGateway.newTransaction({
+        userId: fromWalletExists.user.id.toString(),
+      });
+      this.notificationGateway.newTransaction({
+        userId: toWalletExists.user.id.toString(),
+      });
+    }
 
     return right(undefined);
   }
