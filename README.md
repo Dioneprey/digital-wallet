@@ -89,7 +89,7 @@ cd digital-wallet
 
 cp web/.env.example web/.env && cp api/.env.example api/.env
 
-docker compose --profile api up --build -d
+docker compose --profile app up --build -d
 ```
 
 ## 🔌 Opção 2: Rodar localmente ( serviços continuam no docker )
@@ -112,11 +112,17 @@ npm run start:dev     # Rodar a API
 # 🔹 Web - Terminal 2
 # digital-wallet/web
 cd web
-nnpm install           # Instalar dependênciasClient
-pnpm run dev     # Rodar o nextjs
+npm install           # Instalar dependênciasClient
+npm run dev     # Rodar o nextjs
 ```
 
 # 🌐 URLs
+
+## 📘 Front
+
+- Endpoint: [http://localhost:3000](http://localhost:3000)
+
+---
 
 ## 📘 API
 
