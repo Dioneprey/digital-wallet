@@ -11,6 +11,7 @@ import {
   WalletWithInclude,
 } from '../mappers/prisma-wallet.mapper';
 import { userKeys } from './prisma-user.repository';
+import { buildCacheKey } from 'src/core/helpers/buid-cache-key';
 
 export const walletKeys: WalletKey[] = ['id', 'userId'];
 
@@ -23,8 +24,12 @@ export class PrismaWalletRepository implements WalletRepository {
   async findByUniqueField({
     key,
     value,
+    include,
   }: WalletRepositoryFindByUniqueFieldProps) {
-    const cacheKey = `wallet:${key}:${value}`;
+    const cacheKey = buildCacheKey({
+      baseKey: `wallet:${key}:${value}`,
+      include,
+    });
     const cached = await this.redisRepository.get<WalletWithInclude>(cacheKey);
 
     if (cached) {
@@ -35,6 +40,7 @@ export class PrismaWalletRepository implements WalletRepository {
       where: {
         [key]: value,
       },
+      include,
     });
 
     if (!prismaWallet) {

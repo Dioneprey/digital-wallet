@@ -10,6 +10,8 @@ import { TransactionRepository } from 'src/domain/wallet/application/repositorie
 import { PrismaTransactionRepository } from './prisma/repositories/prisma-transaction.repository';
 import { WalletRepository } from 'src/domain/wallet/application/repositories/wallet.repository';
 import { PrismaWalletRepository } from './prisma/repositories/prisma-wallet.repository';
+import { NotificationRepository } from 'src/domain/wallet/application/repositories/notification.repository';
+import { PrismaNotificationRepository } from './prisma/repositories/prisma-notification-repository';
 
 @Module({
   imports: [EnvModule],
@@ -32,6 +34,10 @@ import { PrismaWalletRepository } from './prisma/repositories/prisma-wallet.repo
       provide: WalletRepository,
       useClass: PrismaWalletRepository,
     },
+    {
+      provide: NotificationRepository,
+      useClass: PrismaNotificationRepository,
+    },
   ],
   exports: [
     PrismaService,
@@ -39,6 +45,7 @@ import { PrismaWalletRepository } from './prisma/repositories/prisma-wallet.repo
     CodeRepository,
     TransactionRepository,
     WalletRepository,
+    NotificationRepository,
   ],
 })
 export class DatabaseModule {}

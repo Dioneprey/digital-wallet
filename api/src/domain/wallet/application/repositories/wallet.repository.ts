@@ -1,8 +1,9 @@
-import { Wallet, WalletKey } from '../../entities/wallet';
+import { Wallet, WalletInclude, WalletKey } from '../../entities/wallet';
 
 export interface WalletRepositoryFindByUniqueFieldProps {
   key: WalletKey;
   value: string;
+  include?: WalletInclude;
 }
 
 export abstract class WalletRepository {

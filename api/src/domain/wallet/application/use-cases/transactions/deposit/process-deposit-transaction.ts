@@ -5,6 +5,8 @@ import { WalletRepository } from '../../../repositories/wallet.repository';
 import { TransactionRepository } from '../../../repositories/transaction.repository';
 import { TransactionStatus } from 'src/domain/wallet/entities/transaction';
 import { ResourceInvalidError } from '../../@errors/resource-invalid.error';
+import { CreateNotificationSchedule } from '../../../schedules/create-notification';
+import { NotificationGateway } from 'src/infra/events/gateways/socket/notification.gateway';
 
 interface ProcessDepositTransactionUseCaseRequest {
   transactionId: string;
@@ -21,6 +23,8 @@ export class ProcessDepositTransactionUseCase {
   constructor(
     private walletRepository: WalletRepository,
     private transactionRepository: TransactionRepository,
+    private createNotificationSchedule: CreateNotificationSchedule,
+    private notificationGateway: NotificationGateway,
   ) {}
 
   async execute({
@@ -62,6 +66,18 @@ export class ProcessDepositTransactionUseCase {
     await this.transactionRepository.applyTransactionToWallet({
       transaction: transactionExists,
       wallet: walletExists,
+    });
+
+    this.createNotificationSchedule.enqueueJob({
+      userId: walletExists.userId.toString(),
+      title: 'Depósito confirmado',
+      variables: {
+        amount: transactionExists.amount,
+      },
+    });
+
+    this.notificationGateway.newTransaction({
+      userId: walletExists.userId.toString(),
     });
 
     return right(undefined);

@@ -31,6 +31,7 @@ async function bootstrap() {
   const nodeEnv = envService.get('NODE_ENV');
   const sentryDsn = envService.get('SENTRY_DSN');
   const cookieSecret = envService.get('COOKIE_SECRET');
+  const corsOrigin = envService.get('CORS_ORIGIN');
 
   app.useGlobalFilters(new AllExceptionsFilter());
 
@@ -53,8 +54,9 @@ async function bootstrap() {
   });
 
   app.enableCors({
-    origin: ['http://localhost:3000'],
+    origin: [corsOrigin],
     credentials: true,
+    allowedHeaders: ['*'],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   });
 

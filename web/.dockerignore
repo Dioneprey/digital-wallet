@@ -1,0 +1,57 @@
+# Dependências
+node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+pnpm-lock.yaml
+
+# Build
+.next
+out
+dist
+
+# Configs locais
+.env.local
+.env.development
+.env.test
+.env*.local
+
+# Sistemas/OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs
+*.pid
+*.seed
+*.pid.lock
+
+# Editor/IDE
+.vscode
+.idea
+*.swp
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose.yml
+
+# Cache de ferramentas
+.cache
+.next/cache
+
+# Arquivos de testes
+coverage
+*.spec.ts
+*.spec.js
+*.test.ts
+*.test.js
+__tests__
+
+# Uploads temporários
+tmp
+temp

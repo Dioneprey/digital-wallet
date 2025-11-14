@@ -32,6 +32,13 @@ import { FetchUsersByEmailUseCase } from 'src/domain/wallet/application/use-case
 import { ReverseTransferTransactionUseCase } from 'src/domain/wallet/application/use-cases/transactions/transfer/reverse-transfer-transaction';
 import { ProcessReverseTransferTransactionUseCase } from 'src/domain/wallet/application/use-cases/transactions/transfer/process-reverse-transfer-transaction';
 import { ReverseTransferTransactionController } from './controllers/transaction/transfer/reverse-transfer-transaction.controller';
+import { FetchNotificationsController } from './controllers/notification/fetch-notifications.controller';
+import { MarkNotificationAsReadedController } from './controllers/notification/mark-notification-as-readed.controller';
+import { MarkNotificationAsUnreadedController } from './controllers/notification/mark-notification-as-unreaded.controller';
+import { FetchNotificationsUseCase } from 'src/domain/wallet/application/use-cases/notification/fetch-notification';
+import { MarkNotificationAsReadedUseCase } from 'src/domain/wallet/application/use-cases/notification/mark-notification-as-readed';
+import { MarkNotificationAsUnreadedUseCase } from 'src/domain/wallet/application/use-cases/notification/mark-notification-as-unreaded';
+import { EventsModule } from '../events/events.module';
 
 @Module({
   imports: [
@@ -39,6 +46,7 @@ import { ReverseTransferTransactionController } from './controllers/transaction/
     DatabaseModule,
     AuthModule,
     CryptographyModule,
+    EventsModule,
     forwardRef(() => BullMqConfigModule),
   ],
   controllers: [
@@ -61,6 +69,11 @@ import { ReverseTransferTransactionController } from './controllers/transaction/
     CreateTransferTransactionController,
     FetchTransactionsController,
     ReverseTransferTransactionController,
+
+    // Notifications
+    FetchNotificationsController,
+    MarkNotificationAsReadedController,
+    MarkNotificationAsUnreadedController,
   ],
   providers: [
     // Atuh
@@ -86,6 +99,11 @@ import { ReverseTransferTransactionController } from './controllers/transaction/
     FetchTransactionsUseCase,
     ReverseTransferTransactionUseCase,
     ProcessReverseTransferTransactionUseCase,
+
+    // Notifications
+    FetchNotificationsUseCase,
+    MarkNotificationAsReadedUseCase,
+    MarkNotificationAsUnreadedUseCase,
   ],
   exports: [
     UpdateTransactionOnErrorUseCase,

@@ -1,4 +1,5 @@
 "use client";
+import { useTransactions } from "@/common/hooks/use-transactions";
 import { EmptyTransactions } from "@/components/empty-transactions";
 import TransactionItem from "@/components/transaction-item";
 import { CardContent } from "@/components/ui/card";
@@ -7,6 +8,8 @@ import { getWallet } from "@/services/wallet";
 import { useQuery } from "@tanstack/react-query";
 
 export function LastTranscationsList() {
+  useTransactions();
+
   const { data: walletData } = useQuery({
     queryKey: ["balance"],
     queryFn: () => getWallet(),

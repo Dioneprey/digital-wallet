@@ -11,6 +11,7 @@ import { EmptyTransactions } from "@/components/empty-transactions";
 import { TransactionsPagination } from "./transactions-pagination";
 import { useQuery } from "@tanstack/react-query";
 import { getWallet } from "@/services/wallet";
+import { useTransactions } from "@/common/hooks/use-transactions";
 
 export function TransactionsList({
   status,
@@ -21,6 +22,7 @@ export function TransactionsList({
   type?: TransactionType;
   pageIndex?: string;
 }) {
+  useTransactions();
   const { data: walletData } = useQuery({
     queryKey: ["balance"],
     queryFn: () => getWallet(),

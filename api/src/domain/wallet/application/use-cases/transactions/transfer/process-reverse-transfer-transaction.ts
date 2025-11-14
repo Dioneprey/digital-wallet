@@ -9,6 +9,8 @@ import {
   ReversalInitiator,
   TransactionStatus,
 } from 'src/domain/wallet/entities/transaction';
+import { CreateNotificationSchedule } from '../../../schedules/create-notification';
+import { NotificationGateway } from 'src/infra/events/gateways/socket/notification.gateway';
 
 interface ProcessReverseTransferTransactionUseCaseRequest {
   transactionId: string;
@@ -27,6 +29,8 @@ export class ProcessReverseTransferTransactionUseCase {
   constructor(
     private walletRepository: WalletRepository,
     private transactionRepository: TransactionRepository,
+    private createNotificationSchedule: CreateNotificationSchedule,
+    private notificationGateway: NotificationGateway,
   ) {}
 
   async execute({
@@ -44,10 +48,16 @@ export class ProcessReverseTransferTransactionUseCase {
         this.walletRepository.findByUniqueField({
           key: 'id',
           value: fromWalletId,
+          include: {
+            user: true,
+          },
         }),
         this.walletRepository.findByUniqueField({
           key: 'id',
           value: toWalletId,
+          include: {
+            user: true,
+          },
         }),
       ]);
 
@@ -57,11 +67,11 @@ export class ProcessReverseTransferTransactionUseCase {
       );
     }
 
-    if (!fromWalletExists) {
+    if (!fromWalletExists || !fromWalletExists.user) {
       return left(new ResourceNotFoundError(`Wallet with id: ${fromWalletId}`));
     }
 
-    if (!toWalletExists) {
+    if (!toWalletExists || !toWalletExists.user) {
       return left(new ResourceNotFoundError(`Wallet with id: ${toWalletId}`));
     }
 
@@ -78,6 +88,33 @@ export class ProcessReverseTransferTransactionUseCase {
       transaction: transactionExists,
       fromWallet: fromWalletExists,
       toWallet: toWalletExists,
+    });
+
+    await Promise.all([
+      this.createNotificationSchedule.enqueueJob({
+        userId: fromWalletExists.userId.toString(),
+        title: 'Transferência revertida',
+        variables: {
+          isSender: true,
+          amount: transactionExists.amount,
+          userName: toWalletExists.user.name,
+        },
+      }),
+      this.createNotificationSchedule.enqueueJob({
+        userId: fromWalletExists.userId.toString(),
+        title: 'Transferência revertida',
+        variables: {
+          amount: transactionExists.amount,
+          userName: fromWalletExists.user.name,
+        },
+      }),
+    ]);
+
+    this.notificationGateway.newTransaction({
+      userId: fromWalletExists.user.id.toString(),
+    });
+    this.notificationGateway.newTransaction({
+      userId: toWalletExists.user.id.toString(),
     });
 
     return right(undefined);
