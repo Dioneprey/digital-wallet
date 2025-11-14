@@ -24,7 +24,7 @@ services:
       timeout: 5s
       retries: 5
     profiles:
-      - api
+      - app
   database:
     container_name: digital_wallet_database
     env_file:

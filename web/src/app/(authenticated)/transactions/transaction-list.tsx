@@ -56,8 +56,8 @@ export function TransactionsList({
 
   return (
     <>
-      {data?.transactions && data?.transactions?.length > 0 ? (
-        data.transactions.map((transaction) => (
+      {(data?.transactions?.length || 0) > 0 ? (
+        data?.transactions.map((transaction) => (
           <TransactionItem
             key={transaction.id}
             transaction={transaction}
