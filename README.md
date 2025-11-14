@@ -83,7 +83,8 @@
 ## 🔌 Opção 1: Rodar tudo via Docker
 
 ```bash
-git clone https://github.com/Dioneprey/digital-wallet
+git clone https://github.com/Dioneprey/digital-wallet.git
+
 cd digital-wallet
 
 cp web/.env.example web/.env && cp api/.env.example api/.env
@@ -94,7 +95,7 @@ docker compose --profile api up --build -d
 ## 🔌 Opção 2: Rodar localmente ( serviços continuam no docker )
 
 ```bash
-git clone https://github.com/Dioneprey/digital-wallet
+git clone https://github.com/Dioneprey/digital-wallet.git
 cd digital-wallet
 
 cp web/.env.example web/.env && cp api/.env.example api/.env
